@@ -23,14 +23,14 @@ function LandingPage() {
     <>
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 font-sans text-black">
   <div className="w-full max-w-4xl text-center">
-    <header className="mb-8">
+    <header className=" mb-6 sm:mb-8">
       <p className="inline-block rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-800">Launching very soon!</p>
     </header>
 
     <main>
       <h1 className="mb-7 text-6xl font-bold leading-tight md:text-8xl">Quiz AI</h1>
-      <p className="text-xl mx-auto mb-4 max-w-2xl font-semibold sm:text-xl md:text-2xl ">Generate and share engaging quizzes effortlessly with AI in one click.</p>
-      <p className="text-l mx-auto mb-8 max-w-2xl font-semibold sm:text-xl md:text-2xl ">Perfect for educators, content creators, and students.</p>
+      <p className="text-xl mx-auto mb-4 max-w-2xl font-medium sm:mx-auto sm:text-xl md:text-2xl md:font-semibold">Generate and share engaging quizzes effortlessly with AI in one click.</p>
+      <p className="text-l mx-auto mb-8 max-w-2xl font-medium sm:mx:auto sm:text-xl md:text-2xl md:font-semibold">Perfect for educators, content creators, and students.</p>
       <form onSubmit={handleSubmit} className="mx-auto flex max-w-lg flex-col items-center justify-center gap-4 sm:flex-row">
         <input type="email" 
         value={email}
