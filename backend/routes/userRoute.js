@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import axios from "axios";
 import Users from "../models/Users.js";
+import launch from "../models/Launch.js";
 import jwt from 'jsonwebtoken';
 import zod from 'zod';
 import bcrypt from 'bcrypt';
@@ -123,14 +124,16 @@ UserRouter.post("google-signin",async(req,res)=>{
 
 });
 
-UserRouter.post("/user", async (req, res) => {
+UserRouter.post("/launch", async (req, res) => {
   try {
-    const userName = req.body.email;
-    const userExists = await Users.findOne({ userName: userName });
+    const email = req.body.email;
+    console.log(email);
+    const userExists = await launch.findOne({ email: email });
+    console.log(userExists);
     if (userExists)
       return res.status(400).json({ message: "User already exists" });
-    const newUser = new Users({
-      userName
+    const newUser = new launch({
+      email:email
     });
     await newUser.save();
     return res.status(201).json({ message: 'user registered successfully' });

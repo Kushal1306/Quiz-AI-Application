@@ -10,7 +10,7 @@ function LandingPage() {
   const handleSubmit=async(e)=>{
     e.preventDefault();
     try {
-    const response=await axios.post("https://quiz-ai-backend.vercel.app/launch/user",{email});
+    const response=await axios.post("https://quiz-ai-backend.vercel.app/user/launch",{email});
     console.log("email submitted:",email);
     if(response)
     navigate('/thanks');
