@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 import zod from 'zod';
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from "google-auth-library";
+import authMiddleware from "../middlewares/authMiddleware.js";
 const client=new OAuth2Client();
 
 const UserRouter = express.Router();
@@ -146,70 +147,104 @@ UserRouter.post("/launch", async (req, res) => {
 });
 
 
-UserRouter.post("/question", async (req, res) => {
-  const topic = req.query.text || "India";
-  const NoOfQuestion = req.query.number || "India";
-  console.log("Topic:", topic);
+// UserRouter.post("/question", async (req, res) => {
+//   const topic = req.query.text || "India";
+//   const NoOfQuestion = req.query.number || "India";
+//   console.log("Topic:", topic);
 
-  const prompt = `You are a helpful AI assistant tasked with creating multiple-choice questions. Please generate ${NoOfQuestion} questions about ${topic}  following these instructions:
+//   const prompt = `You are a helpful AI assistant tasked with creating multiple-choice questions. Please generate ${NoOfQuestion} questions about ${topic}  following these instructions:
   
-  1. Start your response with a valid JSON opening: 
-  2. For each question, provide:
-     - The question text
-     - Four answer options labeled a, b, c, and d
-     - The correct answer letter
-     - A brief explanation for the correct answer
-  3. Format each question as a JSON object within the questions array
-  4. End your response with a valid JSON closing:
+//   1. Start your response with a valid JSON opening: 
+//   2. For each question, provide:
+//      - The question text
+//      - Four answer options labeled a, b, c, and d
+//      - The correct answer letter
+//      - A brief explanation for the correct answer
+//   3. Format each question as a JSON object within the questions array
+//   4. End your response with a valid JSON closing:
   
-  Remember to separate each question object with a comma, and do not include a comma after the last question. Ensure your entire response is valid JSON.
-  `;
+//   Remember to separate each question object with a comma, and do not include a comma after the last question. Ensure your entire response is valid JSON.
+//   `;
 
-  console.log("Prompt:", prompt);
+//   console.log("Prompt:", prompt);
 
-  try {
-    const response = await axios.post(
-      "https://api.together.xyz/v1/completions",
-      {
-        model: "mistralai/Mixtral-8x7B-v0.1",
-        prompt: prompt,
-        max_tokens: 1500,
-        stop: "]"
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    console.log("the response is", response);
-    console.log("the response data", response.data);
-    // const responseData = response.data; // Extracting data from the Axios response
-    // res.json(responseData); // Sending the response data back to the client
-    let responseData = response.data.choices[0].text.trim();
-    responseData += ']'
+//   try {
+//     const response = await axios.post(
+//       "https://api.together.xyz/v1/completions",
+//       {
+//         model: "mistralai/Mixtral-8x7B-v0.1",
+//         prompt: prompt,
+//         max_tokens: 1500,
+//         stop: "]"
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+//     console.log("the response is", response);
+//     console.log("the response data", response.data);
+//     // const responseData = response.data; // Extracting data from the Axios response
+//     // res.json(responseData); // Sending the response data back to the client
+//     let responseData = response.data.choices[0].text.trim();
+//     responseData += ']'
 
-    console.log("the data is", responseData);
-    const jsonStart = responseData.indexOf('[');
-    const jsonEnd = responseData.lastIndexOf(']') + 1;
+//     console.log("the data is", responseData);
+//     const jsonStart = responseData.indexOf('[');
+//     const jsonEnd = responseData.lastIndexOf(']') + 1;
 
-    if (jsonStart === -1 || jsonEnd === -1) {
-      throw new Error("Invalid JSON response");
-    }
+//     if (jsonStart === -1 || jsonEnd === -1) {
+//       throw new Error("Invalid JSON response");
+//     }
 
-    const jsonResponse = responseData.substring(jsonStart, jsonEnd);
+//     const jsonResponse = responseData.substring(jsonStart, jsonEnd);
 
-    // Parse the JSON response to ensure it is valid
-    const parsedData = JSON.parse(jsonResponse);
+//     // Parse the JSON response to ensure it is valid
+//     const parsedData = JSON.parse(jsonResponse);
 
-    res.json(parsedData); //
-  } catch (error) {
-    console.error("Error generating questions:", error.message);
-    res.status(500).send("Error generating questions");
-  }
+//     res.json(parsedData); //
+//   } catch (error) {
+//     console.error("Error generating questions:", error.message);
+//     res.status(500).send("Error generating questions");
+//   }
+// });
+
+//get details of user using the site "me"
+UserRouter.get("/me",authMiddleware,async(req,res)=>{
+     const userId=req.userId;
+     try {
+      //retrieving all details except password
+      const user=await Users.findById(userId).select('-password');
+      if(!user)
+        return res.status(401).json({message:'Error occured'});
+      console.log(user);
+      return res.json(user);
+      
+     } catch (error) {
+       console.error(error);
+       return res.status(401).json({message:'Error occured'});
+     } 
+})
+
+// updating details of user
+UserRouter.patch("/me",authMiddleware,async(req,res)=>{
+       const userId=req.userId;
+       const {firstName,lastName,password}=req.body;
+       try {
+        const updateUser=await Users.findByIdAndUpdate(userId,req.body,{new:true});
+        if(!updateUser)
+          return res.status(401).json({message:'User details not updated'});
+        return res.status(200).json({
+          message:'details updated successfully',
+          details:updateUser
+        });
+       } catch (error) {
+        console.error(error);
+       return res.status(401).json({message:'Error occured'});
+       }
 });
-
 
 
 export default UserRouter;

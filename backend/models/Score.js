@@ -6,13 +6,11 @@ const scoreSchema=mongoose.Schema({
         ref:'Quizzes'
     },
     userId:{
-        tyoe:mongoose.Schema.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:'Users'
     },
     status:{
-        type:String,
-        enum:["ongoing","completed"],
-        default:"ongoing"
+        type:String
     },
     score:{
         type:Number
@@ -22,3 +20,9 @@ const scoreSchema=mongoose.Schema({
 const Scores=mongoose.model("Scores",scoreSchema);
 
 export default Scores;
+
+/*
+enum:["ongoing","completed"],
+default:"ongoing"
+
+*/

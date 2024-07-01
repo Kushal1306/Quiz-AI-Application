@@ -3,7 +3,10 @@ import axios from "axios";
 import dotenv from "dotenv";
 import cors from 'cors';
 import connectToDB from "./config/db.js";
-import UserRouter from "./routes/userRoute.js";
+import mainRouter from "./routes/index.js";
+// import UserRouter from "./routes/userRoute.js";
+// import questionRouter from "./routes/questionRoute.js";
+// import quizRouter from "./routes/quizRoute.js";
 
 dotenv.config();
 
@@ -13,7 +16,10 @@ const port=process.env.port||3000;
 app.use(express.json());
 app.use(cors());
 
-app.use("/user",UserRouter);
+// app.use("/user",UserRouter);
+// app.use("/quiz",quizRouter);
+// app.use("/question",questionRouter);
+app.use(mainRouter);
 
 connectToDB()
     .then(() => {

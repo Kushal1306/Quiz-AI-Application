@@ -2,6 +2,8 @@ import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import Quizzes from '../models/Quizzes.js';
 import delQuestionsMiddlware from '../middlewares/deleteQuestions.js';
+import Questions from '../models/Questions.js';
+import mongoose from 'mongoose';
 
 const quizRouter = express.Router();
 
@@ -11,9 +13,10 @@ quizRouter.post("/create-quiz", authMiddleware, async (req, res) => {
     try {
         const userId = req.userId;
         const { title, description } = req.body;
-        const newQuiz = Quizzes.create({
-            title,
-            description
+        const newQuiz =await Quizzes.create({
+            title:title,
+            description:description,
+            userId:userId
         });
         console.log(newQuiz);
         return res.status(201).json({
@@ -44,6 +47,19 @@ quizRouter.patch("/edit-quiz", authMiddleware, async (req, res) => {
     }
 });
 
+// Route to take quiz or play quiz
+
+quizRouter.get("/take-quiz/:quizId",authMiddleware,async(req,res)=>{
+   const quizId=req.params.quizId;
+   try {
+       const questions=await Questions.find({quizId:quizId}).sort({order:1});
+       res.status(200).json(questions);
+   } catch (error) {
+    console.error(error);
+    return res.status(401).json({message:'Error occured'});
+   }
+});
+
 //If we delete a quiz we should also delete questions under it right so first delete questions and then deleting quiz
 // idea-2 we have a transaction in place deleting both or deleting none.
 quizRouter.delete("/delete-quiz",authMiddleware,delQuestionsMiddlware,async(req,res)=>{
@@ -58,3 +74,5 @@ quizRouter.delete("/delete-quiz",authMiddleware,delQuestionsMiddlware,async(req,
         return res.status(401).json({ message: "delete request failed" });
     }
 });
+
+export default quizRouter;
