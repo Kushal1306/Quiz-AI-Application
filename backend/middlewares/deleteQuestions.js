@@ -9,7 +9,6 @@ const delQuestionsMiddlware=async(req,res,next)=>{
         if(!deleteQuestions)
             return res.status(401).json({message:'Questions werenot deleted'});
         next();
-        
     } catch (error) {
       console.log(error);
       return res.status(401).json({message:'unable to delete questions'})

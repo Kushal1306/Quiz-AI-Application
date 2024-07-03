@@ -7,9 +7,11 @@ import mongoose from 'mongoose';
 const questionRouter = express.Router();
 
 questionRouter.post("/generate", authMiddleware, async (req, res) => {
-    const quizId = req.query.quizId;
-    const topic = req.query.text || "India";
-    const NoOfQuestion = req.query.number || "India";
+    const {quizId,title,Number}=req.body;
+    const topic = title || "India";
+    const NoOfQuestion = Number|| 5;
+    console.log(quizId);
+    console.log(NoOfQuestion);
     console.log("Topic:", topic);
 
     const prompt = `You are a helpful AI assistant tasked with creating multiple-choice questions. Please generate ${NoOfQuestion} questions about ${topic}  following these instructions:

@@ -12,10 +12,12 @@ const quizRouter = express.Router();
 quizRouter.post("/create-quiz", authMiddleware, async (req, res) => {
     try {
         const userId = req.userId;
-        const { title, description } = req.body;
+        const title=req.body.title;
+        const topicName=req.body.topic;
+        // const { title, description } = req.body;
         const newQuiz =await Quizzes.create({
             title:title,
-            description:description,
+            description:topicName,
             userId:userId
         });
         console.log(newQuiz);
@@ -48,6 +50,20 @@ quizRouter.patch("/edit-quiz", authMiddleware, async (req, res) => {
 });
 
 // Route to take quiz or play quiz
+quizRouter.get("/all",authMiddleware,async(req,res)=>{
+    const userId=req.userId;
+    try {
+        const myQuizzes=await Quizzes.find({userId:userId});
+        if(!myQuizzes)
+            return res.status(200).json({message:'no quizzes exist'});
+        return res.status(200).json(myQuizzes);
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(401).json({message:'error occured'});
+    }
+
+});
 
 quizRouter.get("/take-quiz/:quizId",authMiddleware,async(req,res)=>{
    const quizId=req.params.quizId;
@@ -74,5 +90,7 @@ quizRouter.delete("/delete-quiz",authMiddleware,delQuestionsMiddlware,async(req,
         return res.status(401).json({ message: "delete request failed" });
     }
 });
+
+
 
 export default quizRouter;

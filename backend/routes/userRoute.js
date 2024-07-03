@@ -88,7 +88,7 @@ UserRouter.post("/signin", async (req, res) => {
 
 });
 
-UserRouter.post("google-signin",async(req,res)=>{
+UserRouter.post("/google-signin",async(req,res)=>{
   const token=req.body.token;
   console.log(token);
   try {
@@ -105,7 +105,6 @@ UserRouter.post("google-signin",async(req,res)=>{
     if(!user){
       user=await Users.create({
         userName,
-        password,
         firstName,
         lastName,
         googleId:googleId

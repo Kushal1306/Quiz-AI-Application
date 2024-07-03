@@ -48,7 +48,16 @@ scoreRouter.get("/:quizId/me",authMiddleware,async(req,res)=>{
    const quizId=req.params.quizId;
    const userId=req.userId;
    try {
-    const myScore=await Scores.find({quizId:quizId,userId:userId});
+    const myScore=await Scores.findOne({
+        $and:[
+           {quizId:quizId},
+           {userId:userId}
+        ]
+    });
+    if(!myScore)
+        return res.status(400).json({
+    message:'error generating your score'
+    });
 
     
    } catch (error) {
