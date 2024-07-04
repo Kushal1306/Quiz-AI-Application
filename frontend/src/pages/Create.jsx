@@ -1,138 +1,21 @@
 import React, { useState } from "react";
-import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, PlusCircle } from 'lucide-react';
+import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, PlusCircle,Clipboard } from 'lucide-react';
 import axios from 'axios';
 
 function Create() {
     const [title, setTitle] = useState("");
     const [topic, setTopicName] = useState("");
     const [noofQuestions, setNoofQuestions] = useState(5);
-    const [buttonGenerate, setButtonGenerate] = useState(false);
+    const [buttonGenerate, setButtonGenerate] = useState(true);
     const [loading, setLoading] = useState(false);
     const [quizId, setQuizId] = useState("");
-    const [questions, setQuestions] = useState([
-        {
-            "_id": "66866d61074768a1525b8b35",
-            "quizId": "66866d44074768a1525b8b33",
-            "questionText": "What is the source of River Ganga?",
-            "options": [
-                "Gangotri Glacier",
-                "Yamunotri Glacier",
-                "Kedarnath Glacier",
-                "Badrinath Glacier"
-            ],
-            "correctAnswerIndex": 0,
-            "explanation": "Gangotri Glacier is the source of River Ganga.",
-            "order": 1,
-            "__v": 0,
-            "createdAt": "2024-07-04T09:37:37.809Z",
-            "updatedAt": "2024-07-04T09:37:37.809Z"
-        },
-        {
-            "_id": "66866d61074768a1525b8b36",
-            "quizId": "66866d44074768a1525b8b33",
-            "questionText": "Which state does River Ganga flow through?",
-            "options": [
-                "Uttarakhand",
-                "Uttar Pradesh",
-                "Bihar",
-                "West Bengal"
-            ],
-            "correctAnswerIndex": 3,
-            "explanation": "River Ganga flows through Uttarakhand, Uttar Pradesh, Bihar, and West Bengal.",
-            "order": 2,
-            "__v": 0,
-            "createdAt": "2024-07-04T09:37:37.810Z",
-            "updatedAt": "2024-07-04T09:37:37.810Z"
-        },
-        {
-            "_id": "66866d61074768a1525b8b37",
-            "quizId": "66866d44074768a1525b8b33",
-            "questionText": "What is the length of River Ganga?",
-            "options": [
-                "2,525 km",
-                "2,414 km",
-                "2,312 km",
-                "2,200 km"
-            ],
-            "correctAnswerIndex": 0,
-            "explanation": "River Ganga is 2,525 km long.",
-            "order": 3,
-            "__v": 0,
-            "createdAt": "2024-07-04T09:37:37.812Z",
-            "updatedAt": "2024-07-04T09:37:37.812Z"
-        },
-        {
-            "_id": "66866d61074768a1525b8b38",
-            "quizId": "66866d44074768a1525b8b33",
-            "questionText": "Which city is considered the holiest along River Ganga?",
-            "options": [
-                "Varanasi",
-                "Haridwar",
-                "Allahabad",
-                "Rishikesh"
-            ],
-            "correctAnswerIndex": 0,
-            "explanation": "Varanasi is considered the holiest city along River Ganga.",
-            "order": 4,
-            "__v": 0,
-            "createdAt": "2024-07-04T09:37:37.812Z",
-            "updatedAt": "2024-07-04T09:37:37.812Z"
-        },
-        {
-            "_id": "66866d61074768a1525b8b39",
-            "quizId": "66866d44074768a1525b8b33",
-            "questionText": "Which river is considered the main tributary of River Ganga?",
-            "options": [
-                "Yamuna",
-                "Kosi",
-                "Gomti",
-                "Ghaghara"
-            ],
-            "correctAnswerIndex": 0,
-            "explanation": "Yamuna is considered the main tributary of River Ganga.",
-            "order": 5,
-            "__v": 0,
-            "createdAt": "2024-07-04T09:37:37.813Z",
-            "updatedAt": "2024-07-04T09:37:37.813Z"
-        },
-        {
-            "_id": "66866d61074768a1525b8b3a",
-            "quizId": "66866d44074768a1525b8b33",
-            "questionText": "Which state has the largest share of River Ganga's basin area?",
-            "options": [
-                "Uttar Pradesh",
-                "Bihar",
-                "West Bengal",
-                "Uttarakhand"
-            ],
-            "correctAnswerIndex": 0,
-            "explanation": "Uttar Pradesh has the largest share of River Ganga's basin area.",
-            "order": 6,
-            "__v": 0,
-            "createdAt": "2024-07-04T09:37:37.813Z",
-            "updatedAt": "2024-07-04T09:37:37.813Z"
-        },
-        {
-            "_id": "66866d61074768a1525b8b3b",
-            "quizId": "66866d44074768a1525b8b33",
-            "questionText": "Which river is considered the main tributary of River Ganga?",
-            "options": [
-                "Yamuna",
-                "Kosi",
-                "Gomti",
-                "Ghaghara"
-            ],
-            "correctAnswerIndex": 0,
-            "explanation": "Yamuna is considered the main tributary of River Ganga.",
-            "order": 7,
-            "__v": 0,
-            "createdAt": "2024-07-04T09:37:37.814Z",
-            "updatedAt": "2024-07-04T09:37:37.814Z"
-        }
-    ]);
+    const [questions, setQuestions] = useState([]);
     const [editingQuestionId, setEditingQuestionId] = useState(null);
     const [editedQuestion, setEditedQuestion] = useState({});
     const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+    const [quizLink,setQuizLink]=useState("");
+    const [copySuccess,setCopySuccess]=useState("");
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -140,7 +23,7 @@ function Create() {
         setButtonGenerate(false);
         const token = localStorage.getItem("token");
         try {
-            const response = await axios.post("http://localhost:3000/quiz/create-quiz", {
+            const response = await axios.post("https://quiz-ai-backend.vercel.app/quiz/create-quiz", {
                 title,
                 topic
             }, {
@@ -152,7 +35,7 @@ function Create() {
             const newQuizId = response.data.quizId;
             setQuizId(newQuizId);
 
-            const generateQuestions = await axios.post("http://localhost:3000/question/generate", {
+            const generateQuestions = await axios.post("https://quiz-ai-backend.vercel.app/question/generate", {
                 quizId: newQuizId,
                 topic,
                 noofQuestions
@@ -163,6 +46,8 @@ function Create() {
                 }
             });
             setQuestions(generateQuestions.data);
+            const myLink=`https://quiz-ai-app.vercel.app/play?quizId=${newQuizId}`
+            setQuizLink(myLink);
         } catch (error) {
             console.error(error);
         } finally {
@@ -252,13 +137,22 @@ function Create() {
         }
     };
 
+    const handleCopyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(quizLink);
+            setCopySuccess("Copied!");
+            setTimeout(() => setCopySuccess(""), 2000); // Clear the message after 2 seconds
+        } catch (error) {
+            console.error("Failed to copy: ", error);
+            setCopySuccess("Failed to copy!");
+            setTimeout(() => setCopySuccess(""), 2000); // Clear the message after 2 seconds
+        }
+    };
+
     return (
         <div className="p-4 bg-white min-h-screen">
             <div className="max-w-3xl mx-auto">
-                <h2 className="text-3xl font-bold mb-6 text-black">
-                    Quiz Generator
-                </h2>
-                
+            
                 {buttonGenerate && (
                     <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
                         <form onSubmit={handleSubmit} className="p-4 space-y-3">
@@ -327,6 +221,23 @@ function Create() {
                 )}
                 {questions.length > 0 && (
                     <div className="space-y-4">
+                        {quizLink && (
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex items-center justify-between">
+        <span className="text-sm font-medium text-black truncate flex-grow mr-4">{title}</span>
+        <button
+            onClick={handleCopyToClipboard}
+            className="flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+        >
+            <Clipboard className="w-4 h-4 mr-1" />
+            Copy Link
+        </button>
+    </div>
+)}
+{copySuccess && (
+    <div className={`mt-2 p-2 text-sm rounded-md ${copySuccess === "Copied!" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+        {copySuccess}
+    </div>
+)}
                         {questions.map((question, index) => (
                             <div key={question._id} className="bg-white border border-gray-200 rounded-lg shadow-sm">
                                 <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
@@ -568,5 +479,125 @@ export default Create;
             console.log(error);
         }
     };
+
+    {
+            "_id": "66866d61074768a1525b8b35",
+            "quizId": "66866d44074768a1525b8b33",
+            "questionText": "What is the source of River Ganga?",
+            "options": [
+                "Gangotri Glacier",
+                "Yamunotri Glacier",
+                "Kedarnath Glacier",
+                "Badrinath Glacier"
+            ],
+            "correctAnswerIndex": 0,
+            "explanation": "Gangotri Glacier is the source of River Ganga.",
+            "order": 1,
+            "__v": 0,
+            "createdAt": "2024-07-04T09:37:37.809Z",
+            "updatedAt": "2024-07-04T09:37:37.809Z"
+        },
+        {
+            "_id": "66866d61074768a1525b8b36",
+            "quizId": "66866d44074768a1525b8b33",
+            "questionText": "Which state does River Ganga flow through?",
+            "options": [
+                "Uttarakhand",
+                "Uttar Pradesh",
+                "Bihar",
+                "West Bengal"
+            ],
+            "correctAnswerIndex": 3,
+            "explanation": "River Ganga flows through Uttarakhand, Uttar Pradesh, Bihar, and West Bengal.",
+            "order": 2,
+            "__v": 0,
+            "createdAt": "2024-07-04T09:37:37.810Z",
+            "updatedAt": "2024-07-04T09:37:37.810Z"
+        },
+        {
+            "_id": "66866d61074768a1525b8b37",
+            "quizId": "66866d44074768a1525b8b33",
+            "questionText": "What is the length of River Ganga?",
+            "options": [
+                "2,525 km",
+                "2,414 km",
+                "2,312 km",
+                "2,200 km"
+            ],
+            "correctAnswerIndex": 0,
+            "explanation": "River Ganga is 2,525 km long.",
+            "order": 3,
+            "__v": 0,
+            "createdAt": "2024-07-04T09:37:37.812Z",
+            "updatedAt": "2024-07-04T09:37:37.812Z"
+        },
+        {
+            "_id": "66866d61074768a1525b8b38",
+            "quizId": "66866d44074768a1525b8b33",
+            "questionText": "Which city is considered the holiest along River Ganga?",
+            "options": [
+                "Varanasi",
+                "Haridwar",
+                "Allahabad",
+                "Rishikesh"
+            ],
+            "correctAnswerIndex": 0,
+            "explanation": "Varanasi is considered the holiest city along River Ganga.",
+            "order": 4,
+            "__v": 0,
+            "createdAt": "2024-07-04T09:37:37.812Z",
+            "updatedAt": "2024-07-04T09:37:37.812Z"
+        },
+        {
+            "_id": "66866d61074768a1525b8b39",
+            "quizId": "66866d44074768a1525b8b33",
+            "questionText": "Which river is considered the main tributary of River Ganga?",
+            "options": [
+                "Yamuna",
+                "Kosi",
+                "Gomti",
+                "Ghaghara"
+            ],
+            "correctAnswerIndex": 0,
+            "explanation": "Yamuna is considered the main tributary of River Ganga.",
+            "order": 5,
+            "__v": 0,
+            "createdAt": "2024-07-04T09:37:37.813Z",
+            "updatedAt": "2024-07-04T09:37:37.813Z"
+        },
+        {
+            "_id": "66866d61074768a1525b8b3a",
+            "quizId": "66866d44074768a1525b8b33",
+            "questionText": "Which state has the largest share of River Ganga's basin area?",
+            "options": [
+                "Uttar Pradesh",
+                "Bihar",
+                "West Bengal",
+                "Uttarakhand"
+            ],
+            "correctAnswerIndex": 0,
+            "explanation": "Uttar Pradesh has the largest share of River Ganga's basin area.",
+            "order": 6,
+            "__v": 0,
+            "createdAt": "2024-07-04T09:37:37.813Z",
+            "updatedAt": "2024-07-04T09:37:37.813Z"
+        },
+        {
+            "_id": "66866d61074768a1525b8b3b",
+            "quizId": "66866d44074768a1525b8b33",
+            "questionText": "Which river is considered the main tributary of River Ganga?",
+            "options": [
+                "Yamuna",
+                "Kosi",
+                "Gomti",
+                "Ghaghara"
+            ],
+            "correctAnswerIndex": 0,
+            "explanation": "Yamuna is considered the main tributary of River Ganga.",
+            "order": 7,
+            "__v": 0,
+            "createdAt": "2024-07-04T09:37:37.814Z",
+            "updatedAt": "2024-07-04T09:37:37.814Z"
+        }
 
     */
