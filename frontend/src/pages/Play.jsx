@@ -125,7 +125,7 @@ export default function Play() {
         {showResults ? (
           <div className="text-center">
             <Award className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 text-yellow-400" />
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-white">Quiz Complete!</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-white">Quiz Completed!</h2>
             <p className="text-xl sm:text-2xl mb-4 sm:mb-6 text-gray-300">
               Your Score: <span className="font-bold text-yellow-400">{score}</span> / {totalPossibleScore}
             </p>
