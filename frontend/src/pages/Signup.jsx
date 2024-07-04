@@ -37,7 +37,7 @@ function Signup() {
     try {
         const decoded=jwtDecode(credentialResponse.credential);
         console.log(decoded);
-        const response=await axios.post("http://localhost:3000/user/goole-signin",{
+        const response=await axios.post("https://quiz-ai-backend.vercel.app/user/goole-signin",{
             token:credentialResponse.credential,
         });
         localStorage.setItem("token",response.data.token);

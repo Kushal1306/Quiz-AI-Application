@@ -10,11 +10,13 @@ function MyQuizzes() {
 
     const [searchText,setsearchText]=useState("");
     const navigate=useNavigate();
-    const [quizzes, setQuizzes] = useState([{id:1, title:"A Quiz on India's History", description:"Indian History"},
+    const [quizzes, setQuizzes] = useState([]);
+    /*
+    {id:1, title:"A Quiz on India's History", description:"Indian History"},
         {id:1, title:"A Quiz on India's History", description:"Indian History"},
         {id:2, title:"A Quiz on India's History", description:"Indian History"},
         {id:3, title:"A Quiz on India's History", description:"Indian History"}
-    ]);
+    */
 
     const handleCreateQuiz = () => {
         // Implement quiz creation logic here
@@ -23,25 +25,24 @@ function MyQuizzes() {
     };
 
     useEffect(() => {
-        // const fetchQuizzes = async () => {
-        //     const token = localStorage.getItem("token");
-        //     try {
-        //         const response = await axios.get("http://localhost:3000/quiz/all", {
-        //             params:{
-        //                 title:searchText
-        //             },
-        //             headers: {
-        //                 Authorization: `Bearer ${token}`
-        //             }
-        //         });
-        //         // setQuizzes(response.data);
-        //         console.log(response.data);
-        //     } catch (error) {
-        //         console.error("Error fetching quizzes:", error);
-        //     }
-        // };
-
-        // fetchQuizzes();
+        const fetchQuizzes = async () => {
+            const token = localStorage.getItem("token");
+            try {
+                const response = await axios.get("https://quiz-ai-backend.vercel.app/quiz/all", {
+                    params:{
+                        title:searchText
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setQuizzes(response.data);
+                console.log(response.data);
+            } catch (error) {
+                console.error("Error fetching quizzes:", error);
+            }
+        };
+        fetchQuizzes();
     }, []);
 
     return (
@@ -56,6 +57,9 @@ function MyQuizzes() {
                                 type='text' 
                                 placeholder='Search quizzes' 
                                 className="w-full sm:w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out"
+                                onChange={(e)=>searchText(e.target.value)}
+                                value={searchText}
+
                             />
                         </div>
                         <button 
@@ -65,9 +69,10 @@ function MyQuizzes() {
                             Create Quiz
                         </button>
                     </div>
+                    {quizzes.length>0 &&(
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {quizzes.map((quiz) => (
-                            <div key={quiz.id} className="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl">
+                        {quizzes.map((quiz,index) => (
+                            <div key={quiz._id} className="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl">
                                 <div className="p-6 flex-grow">
                                     <h3 className="text-xl font-bold mb-2 text-gray-800">{quiz.title}</h3>
                                     <p className="text-gray-600">{quiz.description}</p>
@@ -83,7 +88,9 @@ function MyQuizzes() {
                             </div>
                         ))}
                     </div>
+                       )}
                 </div>
+                
             </main>
         </div>
     );

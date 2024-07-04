@@ -9,7 +9,7 @@ const quizRouter = express.Router();
 
 
 // we can also have visibility as of now we will have it public only 
-quizRouter.post("/create-quiz", authMiddleware, async (req, res) => {
+quizRouter.post("/create-quiz", authMiddleware, async (req, res) => {   
     try {
         const userId = req.userId;
         const title=req.body.title;
@@ -52,12 +52,22 @@ quizRouter.patch("/edit-quiz", authMiddleware, async (req, res) => {
 // Route to take quiz or play quiz
 quizRouter.get("/all",authMiddleware,async(req,res)=>{
     const userId=req.userId;
+    const title=req.params.title;
+    console.log(userId);
+    console.log(title);
     try {
-        const myQuizzes=await Quizzes.find({userId:userId});
+        // const myQuizzes=await Quizzes.find({userId:userId
+        // });
+        // const query = { userId: userId };
+        // if (title) {
+        //     console.log("hii");
+        // query.title = { $regex: title, $options: 'i' };
+        // }
+        const myQuizzes = await Quizzes.find({userId:userId});
+        console.log(myQuizzes);
         if(!myQuizzes)
             return res.status(200).json({message:'no quizzes exist'});
-        return res.status(200).json(myQuizzes);
-        
+        return res.status(200).json(myQuizzes);     
     } catch (error) {
         console.error(error);
         return res.status(401).json({message:'error occured'});
@@ -67,6 +77,7 @@ quizRouter.get("/all",authMiddleware,async(req,res)=>{
 
 quizRouter.get("/take-quiz/:quizId",authMiddleware,async(req,res)=>{
    const quizId=req.params.quizId;
+   console.log(quizId);
    try {
        const questions=await Questions.find({quizId:quizId}).sort({order:1});
        res.status(200).json(questions);
@@ -91,6 +102,23 @@ quizRouter.delete("/delete-quiz",authMiddleware,delQuestionsMiddlware,async(req,
     }
 });
 
+quizRouter.get("/:quizId",authMiddleware,async(req,res)=>{
+    const quizId=req.params.quizId;
+    console.log("my id is:",quizId);
+    try {
+        const response=await Quizzes.findById(quizId);
+        if(!response)
+            return res.status(401).send({message:'Incorrect QuizId'});
+        console.log("the response is:",response);
+        return res.status(200).json({message:'Generated succesfully',
+            title:response.title
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(401).json({ message: "request failed" });
+    }
+
+});
 
 
 export default quizRouter;

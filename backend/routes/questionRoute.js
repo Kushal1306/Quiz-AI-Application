@@ -7,23 +7,24 @@ import mongoose from 'mongoose';
 const questionRouter = express.Router();
 
 questionRouter.post("/generate", authMiddleware, async (req, res) => {
-    const {quizId,title,Number}=req.body;
-    const topic = title || "India";
-    const NoOfQuestion = Number|| 5;
-    console.log(quizId);
-    console.log(NoOfQuestion);
+    const {quizId,topic,noofQuestions}=req.body;
+    console.log("the quizId is",quizId);
+    console.log("no of questions",noofQuestions);
     console.log("Topic:", topic);
 
-    const prompt = `You are a helpful AI assistant tasked with creating multiple-choice questions. Please generate ${NoOfQuestion} questions about ${topic}  following these instructions:
+    const prompt = `You are a helpful AI assistant tasked with creating multiple-choice questions. Please generate ${noofQuestions} questions about ${topic}  following these instructions:
     
     1. Start your response with a valid JSON opening: 
     2. For each question, provide:
        - The question text
-       - Four answer options labeled 1, 2, 3, and 4
+       - Four answer options labeled 0, 1, 2, and 3
        - The correct answer number
+       - change correct answer options
        - A brief explanation for the correct answer
+       - dont repeat questions
+       - dont repeat options for a question
     3. Format each question as a JSON object within the questions array
-    4. Generate ${NoOfQuestion} questions as mentioned.
+    4. Generate ${noofQuestions} questions as mentioned.
     5. End your response with a valid JSON closing:
     
     Remember to separate each question object with a comma, and do not include a comma after the last question. Ensure your entire response is valid JSON.
@@ -67,10 +68,14 @@ questionRouter.post("/generate", authMiddleware, async (req, res) => {
         // Parse the JSON response to ensure it is valid
         const parsedData = JSON.parse(jsonResponse);
 
+        function transformOptions(options){
+            return Object.values(options);
+        }
+
         const questionsToInsert=parsedData.map((question,index)=>({
             quizId:quizId,
             questionText: question.question,
-            options:question.options,
+            options:transformOptions(question.options),
             correctAnswerIndex:question.correct_answer,
             explanation:question.explanation,
             order:index+1

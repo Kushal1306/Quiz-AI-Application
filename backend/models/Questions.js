@@ -9,11 +9,14 @@ const QuestionSchema=mongoose.Schema({
     type:String,
   },
   options:{
-    type:Schema.Types.Mixed,
-
+    type:[String],
   },
   correctAnswerIndex:{
    type:Number
+  },
+  score:{
+    type:Number,
+    default:10
   },
   explanation:{
     type:String

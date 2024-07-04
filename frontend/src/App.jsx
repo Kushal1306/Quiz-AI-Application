@@ -7,6 +7,7 @@ import Signin from './pages/Signin';
 import Signup from './pages/Signup';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import MyQuizzes from './pages/MyQuizzes';
+import Play from './pages/Play';
 import Create from './pages/Create';
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
       <Route path='/signin' element={<Signin/>}/>
       <Route path='/signup' element={<Signup/>}/>
       <Route path='/myQuizzes' element={<MyQuizzes/>}/>
+      <Route path='play' element={<Play/>}/>
       <Route path='/create' element={<Create/>}/>
       <Route path='/thanks' element={<Thankingpage/>}/>
       </Routes>
