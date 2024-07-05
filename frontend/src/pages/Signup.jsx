@@ -18,7 +18,7 @@ function Signup() {
 
   const handleSignup=async()=>{
     try { 
-     const response= await axios.post("http://localhost:3000/user/signup",{
+     const response= await axios.post("https://quiz-ai-backend.vercel.app/user/signup",{
         userName,
         password,
         firstName,

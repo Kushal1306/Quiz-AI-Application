@@ -29,7 +29,7 @@ scoreRouter.post("/:quizId",authMiddleware,async(req,res)=>{
 scoreRouter.get("/leaderboard/:quizId",authMiddleware,async(req,res)=>{
       const quizId=req.params.quizId;
       try {
-        const leaderboard=await Scores.find({quizId:quizId}).sort({score:-1});
+        const leaderboard=await Scores.find({quizId:quizId}).sort({score:-1}).populate('userId','firstName');
         if(!leaderboard)
             return res.status(401).json({message:'error fetching leaderboard'});
         return res.status(200).json({message:'leaderboard generated successfully',

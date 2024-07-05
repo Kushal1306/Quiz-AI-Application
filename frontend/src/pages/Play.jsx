@@ -65,6 +65,30 @@ export default function Play() {
       setShowResults(true);
     }
   }, [currentQuestion, questions, showResults]);
+  
+  useEffect(()=>{
+    if (showResults) {
+        const postResults = async () => {
+          setSubmitStatus('submitting');
+          const token = localStorage.getItem("token");
+          try {
+            const response = await axios.post(`http://localhost:3000/score/${quizId}`, {
+              score: score
+            }, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+            setSubmitStatus('success');
+          } catch (error) {
+            console.error('Error posting results:', error);
+            setSubmitStatus('error');
+          }
+        };
+        postResults();
+    }
+    
+},[showResults]);
 
   const handleAnswer = (answer) => {
     if (currentQuestion >= questions.length) {
@@ -144,12 +168,12 @@ export default function Play() {
             {submitStatus === 'error' && (
               <p className="text-red-400 mb-3">Error submitting results. Please try again.</p>
             )}
-            <button
+            {/* <button
               onClick={() => window.location.reload()}
               className="mt-3 px-5 py-2 sm:px-6 sm:py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center text-base sm:text-lg font-semibold"
             >
               <RefreshCw className="mr-2" size={20} /> Retake Quiz
-            </button>
+            </button> */}
           </div>
         ) : (
           <div>
