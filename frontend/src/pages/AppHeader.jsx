@@ -29,8 +29,8 @@ function AppHeader() {
                         <span className="text-white text-xl font-bold">QuizAI</span>
                         <nav className="hidden md:flex space-x-1">
                             <button onClick={() => handleNavigation("/MyQuizzes")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">My Quizzes</button>
-                            <button onClick={() => handleNavigation("/generate")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Take a Quiz</button>
-                            <button onClick={() => handleNavigation("/practice")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Practice Quiz</button>
+                            <button onClick={() => handleNavigation("/take-a-quiz")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Take a Quiz</button>
+                            <button onClick={() => handleNavigation("/take-a-quiz")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Practice Quiz</button>
                         </nav>
                     </div>
                     <div className="flex items-center space-x-4">
