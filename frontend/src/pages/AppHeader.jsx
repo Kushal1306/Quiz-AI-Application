@@ -68,8 +68,8 @@ function AppHeader() {
                 <div className="md:hidden bg-gray-900">
                     <nav className="flex flex-col p-2 space-y-1">
                         <button onClick={() => handleNavigation("/MyQuizzes")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">My Quizzes</button>
-                        <button onClick={() => handleNavigation("/generate")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Take a Quiz</button>
-                        <button onClick={() => handleNavigation("/practice")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Practice Quiz</button>
+                        <button onClick={() => handleNavigation("/take-a-quiz")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Take a Quiz</button>
+                        <button onClick={() => handleNavigation("/take-a-quiz")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Practice Quiz</button>
                     </nav>
                 </div>
             )}
