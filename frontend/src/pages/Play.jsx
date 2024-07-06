@@ -72,7 +72,7 @@ export default function Play() {
           setSubmitStatus('submitting');
           const token = localStorage.getItem("token");
           try {
-            const response = await axios.post(`http://localhost:3000/score/${quizId}`, {
+            const response = await axios.post(`https://quiz-ai-backend.vercel.app/score/${quizId}`, {
               score: score
             }, {
               headers: {

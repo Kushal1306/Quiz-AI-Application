@@ -52,7 +52,7 @@ quizRouter.patch("/edit-quiz", authMiddleware, async (req, res) => {
 // Route to take quiz or play quiz
 quizRouter.get("/all",authMiddleware,async(req,res)=>{
     const userId=req.userId;
-    const title=req.params.title;
+    const  title=req.query.title;
     console.log(userId);
     console.log(title);
     try {
@@ -63,7 +63,13 @@ quizRouter.get("/all",authMiddleware,async(req,res)=>{
         //     console.log("hii");
         // query.title = { $regex: title, $options: 'i' };
         // }
-        const myQuizzes = await Quizzes.find({userId:userId});
+        // const myQuizzes = await Quizzes.find({userId:userId});
+        const queryconditions={userId:userId}
+        if(title && title.trim()!==''){
+            queryconditions.title={ $regex: title.trim(), $options: 'i' };
+        }
+
+        const myQuizzes = await Quizzes.find(queryconditions);
         console.log(myQuizzes);
         if(!myQuizzes)
             return res.status(200).json({message:'no quizzes exist'});
