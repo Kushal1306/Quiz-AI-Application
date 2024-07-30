@@ -17,26 +17,51 @@ function Create() {
     const [copySuccess,setCopySuccess]=useState("");
 
 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     setLoading(true);
+    //     setButtonGenerate(false);
+    //     const token = localStorage.getItem("token");
+    //     try {
+    //         const response = await axios.post("https://quiz-ai-backend.vercel.app/quiz/create-quiz", {
+    //             title,
+    //             topic
+    //         }, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
+    //         const newQuizId = response.data.quizId;
+    //         setQuizId(newQuizId);
+
+    //         const generateQuestions = await axios.post("https://quiz-ai-backend.vercel.app/question/generate", {
+    //             quizId: newQuizId,
+    //             topic,
+    //             noofQuestions
+    //         }, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
+    //         setQuestions(generateQuestions.data);
+    //         const myLink=`https://quiz-ai-app.vercel.app/play?quizId=${newQuizId}`
+    //         setQuizLink(myLink);
+    //     } catch (error) {
+    //         console.error(error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setButtonGenerate(false);
         const token = localStorage.getItem("token");
         try {
-            const response = await axios.post("https://quiz-ai-backend.vercel.app/quiz/create-quiz", {
+            const response = await axios.post("https://quiz-ai-backend.vercel.app/question/generate2", {
                 title,
-                topic
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            const newQuizId = response.data.quizId;
-            setQuizId(newQuizId);
-
-            const generateQuestions = await axios.post("https://quiz-ai-backend.vercel.app/question/generate", {
-                quizId: newQuizId,
                 topic,
                 noofQuestions
             }, {
@@ -45,8 +70,12 @@ function Create() {
                     'Content-Type': 'application/json'
                 }
             });
-            setQuestions(generateQuestions.data);
-            const myLink=`https://quiz-ai-app.vercel.app/play?quizId=${newQuizId}`
+            const newQuizId = response.data.quizId;
+            const questions=response.data.questions;
+            setQuizId(newQuizId);
+            // setQuestions(generateQuestions.data);
+            setQuestions(questions);
+            const myLink = `https://quiz-ai-app.vercel.app/play?quizId=${newQuizId}`;
             setQuizLink(myLink);
         } catch (error) {
             console.error(error);
@@ -601,3 +630,372 @@ export default Create;
         }
 
     */
+
+// import React, { useState } from "react";
+// import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, Clipboard } from 'lucide-react';
+// import axios from 'axios';
+
+// function Create() {
+//     const [title, setTitle] = useState("");
+//     const [topic, setTopicName] = useState("");
+//     const [noofQuestions, setNoofQuestions] = useState(5);
+//     const [buttonGenerate, setButtonGenerate] = useState(true);
+//     const [loading, setLoading] = useState(false);
+//     const [quizId, setQuizId] = useState("");
+//     const [questions, setQuestions] = useState([]);
+//     const [editingQuestionId, setEditingQuestionId] = useState(null);
+//     const [editedQuestion, setEditedQuestion] = useState({});
+//     const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+//     const [quizLink, setQuizLink] = useState("");
+//     const [copySuccess, setCopySuccess] = useState("");
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         setLoading(true);
+//         setButtonGenerate(false);
+//         const token = localStorage.getItem("token");
+//         try {
+//             // const response = await axios.post("http://localhost:3000/quiz/create-quiz", {
+//             //     title,
+//             //     topic
+//             // }, {
+//             //     headers: {
+//             //         Authorization: `Bearer ${token}`,
+//             //         'Content-Type': 'application/json'
+//             //     }
+//             // });
+//             // const newQuizId = response.data.quizId;
+//             // setQuizId(newQuizId);
+
+//             // const generateQuestions = await axios.post("http://localhost:3000/question/generate2", {
+//             //     quizId: newQuizId,
+//             //     topic,
+//             //     noofQuestions
+//             // }, {
+//             //     headers: {
+//             //         Authorization: `Bearer ${token}`,
+//             //         'Content-Type': 'application/json'
+//             //     }
+//             // });
+//             // setQuestions(generateQuestions.data);
+//             const response = await axios.post("http://localhost:3000/question/generate2", {
+//                 title,
+//                 topic,
+//                 noofQuestions
+//             }, {
+//                 headers: {
+//                     Authorization: `Bearer ${token}`,
+//                     'Content-Type': 'application/json'
+//                 }
+//             });
+//             const newQuizId = response.data.quizId;
+//             const questions=response.data.questions;
+//             setQuizId(newQuizId);
+//             // setQuestions(generateQuestions.data);
+//             setQuestions(questions);
+//             const myLink = `https://quiz-ai-app.vercel.app/play?quizId=${newQuizId}`;
+//             setQuizLink(myLink);
+//         } catch (error) {
+//             console.error(error);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     const handleEdit = (question) => {
+//         setEditingQuestionId(question._id);
+//         setEditedQuestion({ ...question });
+//     };
+
+//     const handleSave = async (questionId) => {
+//         const token = localStorage.getItem("token");
+//         try {
+//             const response = await axios.put(`https://quiz-ai-backend.vercel.app/question/${questionId}`, editedQuestion, {
+//                 headers: {
+//                     Authorization: `Bearer ${token}`,
+//                     'Content-Type': 'application/json'
+//                 }
+//             });
+//             setQuestions(questions.map(q => q._id === questionId ? response.data : q));
+//             setEditingQuestionId(null);
+//         } catch (error) {
+//             console.error(error);
+//         }
+//     };
+
+//     const handleCancel = () => {
+//         setEditingQuestionId(null);
+//     };
+
+//     const handleEditChange = (e, index) => {
+//         const { name, value } = e.target;
+//         setEditedQuestion(prev => {
+//             if (name === 'options') {
+//                 const newOptions = [...prev.options];
+//                 newOptions[index] = value;
+//                 return { ...prev, options: newOptions };
+//             } else if (name === 'correctAnswerIndex') {
+//                 return { ...prev, correctAnswerIndex: parseInt(value) };
+//             } else {
+//                 return { ...prev, [name]: value };
+//             }
+//         });
+//     };
+
+//     const toggleExplanation = (questionId) => {
+//         setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
+//     };
+
+//     const handleDelete = async (questionId) => {
+//         const token = localStorage.getItem("token");
+//         try {
+//             await axios.delete(`https://quiz-ai-backend.vercel.app/question/${questionId}`, {
+//                 headers: {
+//                     Authorization: `Bearer ${token}`
+//                 }
+//             });
+//             setQuestions(questions.filter(q => q._id !== questionId));
+//         } catch (error) {
+//             console.error(error);
+//         }
+//     };
+
+//     const handleCopyToClipboard = async () => {
+//         try {
+//             await navigator.clipboard.writeText(quizLink);
+//             setCopySuccess("Copied!");
+//             setTimeout(() => setCopySuccess(""), 2000);
+//         } catch (error) {
+//             console.error("Failed to copy: ", error);
+//             setCopySuccess("Failed to copy!");
+//             setTimeout(() => setCopySuccess(""), 2000);
+//         }
+//     };
+
+//     return (
+//         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8">
+//             <div className="max-w-4xl mx-auto space-y-8">
+//                 <div className="text-center">
+//                     <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+//                         Create Your Quiz
+//                     </h2>
+//                     <p className="mt-4 text-lg text-gray-600">
+//                         Generate engaging quizzes in just a few clicks
+//                     </p>
+//                 </div>
+
+//                 {buttonGenerate && (
+//                     <div className="bg-white shadow-md rounded-lg p-6">
+//                         <h3 className="text-lg font-semibold mb-4">Quiz Details</h3>
+//                         <form onSubmit={handleSubmit} className="space-y-4">
+//                             <div>
+//                                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+//                                     <Captions className="inline w-4 h-4 mr-1" />
+//                                     Title
+//                                 </label>
+//                                 <input
+//                                     id="title"
+//                                     type="text"
+//                                     className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+//                                     placeholder="Enter Title ex: A Quiz on India"
+//                                     required
+//                                     value={title}
+//                                     onChange={(e) => setTitle(e.target.value)}
+//                                 />
+//                             </div>
+//                             <div>
+//                                 <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-1">
+//                                     <BookOpen className="inline w-4 h-4 mr-1" />
+//                                     Topic Name
+//                                 </label>
+//                                 <input
+//                                     id="topic"
+//                                     type="text"
+//                                     className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+//                                     placeholder="Ex: India"
+//                                     required
+//                                     value={topic}
+//                                     onChange={(e) => setTopicName(e.target.value)}
+//                                 />
+//                             </div>
+//                             <div>
+//                                 <label htmlFor="noofQuestions" className="block text-sm font-medium text-gray-700 mb-1">
+//                                     <ListOrdered className="inline w-4 h-4 mr-1" />
+//                                     Number of Questions
+//                                 </label>
+//                                 <input
+//                                     id="noofQuestions"
+//                                     type="number"
+//                                     className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+//                                     placeholder="Number"
+//                                     max={10}
+//                                     required
+//                                     value={noofQuestions}
+//                                     onChange={(e) => setNoofQuestions(e.target.value)}
+//                                 />
+//                             </div>
+//                             <button
+//                                 type="submit"
+//                                 className="w-full bg-indigo-600 text-white font-medium py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 flex items-center justify-center space-x-2"
+//                                 disabled={loading}
+//                             >
+//                                 {loading ? (
+//                                     <span>Generating...</span>
+//                                 ) : (
+//                                     <>
+//                                         <Send className="w-4 h-4" />
+//                                         <span>Generate Quiz</span>
+//                                     </>
+//                                 )}
+//                             </button>
+//                         </form>
+//                     </div>
+//                 )}
+
+//                 {questions.length > 0 && (
+//                     <div className="space-y-6">
+//                         {quizLink && (
+//                             <div className="bg-white shadow-md rounded-lg p-4 flex items-center justify-between">
+//                                 <span className="text-sm font-medium text-gray-700 truncate flex-grow mr-4">{title}</span>
+//                                 <button
+//                                     onClick={handleCopyToClipboard}
+//                                     className="flex items-center px-3 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-300"
+//                                 >
+//                                     <Clipboard className="w-4 h-4 mr-1" />
+//                                     Copy Link
+//                                 </button>
+//                             </div>
+//                         )}
+//                         {copySuccess && (
+//                             <div className={`mt-2 p-2 text-sm rounded-md ${copySuccess === "Copied!" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+//                                 {copySuccess}
+//                             </div>
+//                         )}
+//                         {questions.map((question, index) => (
+//                             <div key={question._id} className="bg-white shadow-md rounded-lg overflow-hidden">
+//                                 <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+//                                     <h3 className="text-md font-semibold text-gray-800">
+//                                         Q {index + 1}
+//                                     </h3>
+//                                     <div className="flex space-x-2">
+//                                         <button
+//                                             onClick={() => handleEdit(question)}
+//                                             className="flex items-center px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-300"
+//                                         >
+//                                             <Edit3 className="w-4 h-4 mr-1" />
+//                                             Edit
+//                                         </button>
+//                                         <button
+//                                             onClick={() => handleDelete(question._id)}
+//                                             className="flex items-center px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300"
+//                                         >
+//                                             <Trash className="w-4 h-4 mr-1" />
+//                                             Delete
+//                                         </button>
+//                                     </div>
+//                                 </div>
+//                                 <div className="p-4">
+//                                     {editingQuestionId === question._id ? (
+//                                         <div className="space-y-3">
+//                                             <input
+//                                                 type="text"
+//                                                 name="questionText"
+//                                                 value={editedQuestion.questionText}
+//                                                 onChange={handleEditChange}
+//                                                 className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+//                                             />
+//                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+//                                                 {editedQuestion.options.map((option, idx) => (
+//                                                     <div key={idx} className="flex items-center">
+//                                                         <input
+//                                                             type="radio"
+//                                                             name="correctAnswerIndex"
+//                                                             value={idx}
+//                                                             checked={idx === editedQuestion.correctAnswerIndex}
+//                                                             onChange={handleEditChange}
+//                                                             className="mr-2"
+//                                                         />
+//                                                         <input
+//                                                             type="text"
+//                                                             name="options"
+//                                                             value={option}
+//                                                             onChange={(e) => handleEditChange(e, idx)}
+//                                                             className="flex-grow p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+//                                                         />
+//                                                     </div>
+//                                                 ))}
+//                                             </div>
+//                                             <textarea
+//                                                 name="explanation"
+//                                                 value={editedQuestion.explanation}
+//                                                 onChange={handleEditChange}
+//                                                 className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+//                                                 rows="2"
+//                                                 placeholder="Explanation (optional)"
+//                                             />
+//                                             <div className="flex space-x-2">
+//                                                 <button
+//                                                     onClick={() => handleSave(question._id)}
+//                                                     className="flex items-center px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300"
+//                                                 >
+//                                                     <Save className="w-4 h-4 mr-1" />
+//                                                     Save
+//                                                 </button>
+//                                                 <button
+//                                                     onClick={handleCancel}
+//                                                     className="flex items-center px-3 py-2 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300"
+//                                                 >
+//                                                     <X className="w-4 h-4 mr-1" />
+//                                                     Cancel
+//                                                 </button>
+//                                             </div>
+//                                         </div>
+//                                     ) : (
+//                                         <div className="space-y-3">
+//                                             <p className="text-sm font-medium text-gray-800">{question.questionText}</p>
+//                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+//                                                 {question.options.map((option, idx) => (
+//                                                     <div
+//                                                         key={idx}
+//                                                         className={`flex items-center p-2 rounded-md transition-all duration-300 cursor-pointer text-sm ${
+//                                                             idx === question.correctAnswerIndex
+//                                                                 ? 'bg-green-100 text-green-800'
+//                                                                 : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+//                                                         }`}
+//                                                     >
+//                                                         <span className="mr-2">{idx + 1}.</span>
+//                                                         <p>{option}</p>
+//                                                     </div>
+//                                                 ))}
+//                                             </div>
+//                                             <div>
+//                                                 <button
+//                                                     onClick={() => toggleExplanation(question._id)}
+//                                                     className="w-full flex justify-between items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition duration-300 text-gray-700 text-sm mt-2"
+//                                                 >
+//                                                     <span className="font-medium">Explanation</span>
+//                                                     {expandedQuestionId === question._id ? (
+//                                                         <ChevronUp className="w-4 h-4" />
+//                                                     ) : (
+//                                                         <ChevronDown className="w-4 h-4" />
+//                                                     )}
+//                                                 </button>
+//                                                 {expandedQuestionId === question._id && (
+//                                                     <div className="mt-2 p-2 bg-gray-50 rounded-md">
+//                                                         <p className="text-gray-700 text-sm">{question.explanation}</p>
+//                                                     </div>
+//                                                 )}
+//                                             </div>
+//                                         </div>
+//                                     )}
+//                                 </div>
+//                             </div>
+//                         ))}
+//                     </div>
+//                 )}
+//             </div>
+//         </div>
+//     );
+// }
+
+// export default Create;

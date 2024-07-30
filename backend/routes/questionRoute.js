@@ -3,8 +3,39 @@ import authMiddleware from '../middlewares/authMiddleware.js';
 import axios from 'axios';
 import Questions from '../models/Questions.js';
 import mongoose from 'mongoose';
+import { z} from 'zod';
+import { ChatOpenAI } from "@langchain/openai";
+import Quizzes from '../models/Quizzes.js';
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const questionRouter = express.Router();
+
+
+// Define the single question schema
+const singleQuestionSchema = z.object({
+  question: z.string().describe("The question text"),
+  options: z.array(z.string()).describe("An array of options for the question"),
+  correctAnswerIndex: z
+    .number()
+    .int()
+    .min(0)
+    .describe(
+      "The index of the correct answer in the options array (zero-indexed)",
+    ),
+  answer: z.string().describe("Give short answer 2 line answer"),
+});
+
+// Define the schema for multiple questions
+const multipleQuestionsSchema = z.object({
+  questions: z.array(singleQuestionSchema),
+});
+
+const model = new ChatOpenAI({
+    model: "gpt-4o-mini",
+    temperature: 0,
+});
+
 
 questionRouter.post("/generate", authMiddleware, async (req, res) => {
     const {quizId,topic,noofQuestions}=req.body;
@@ -71,7 +102,8 @@ questionRouter.post("/generate", authMiddleware, async (req, res) => {
         function transformOptions(options){
             return Object.values(options);
         }
-
+        
+        console.log("the parsed dat is:",parsedData);
         const questionsToInsert=parsedData.map((question,index)=>({
             quizId:quizId,
             questionText: question.question,
@@ -100,6 +132,7 @@ questionRouter.post("/generate", authMiddleware, async (req, res) => {
         // ]
         // const questions=await Questions.aggregate(pipeline);
         const questions=await Questions.find({ quizId: quizId }).sort({ order: 1 });
+        console.log("The solution returned is:",questions);
         res.json(questions);
         // res.json(parsedData); 
     } catch (error) {
@@ -107,6 +140,52 @@ questionRouter.post("/generate", authMiddleware, async (req, res) => {
         res.status(500).send("Error generating questions");
     }
 
+
+});
+
+questionRouter.post("/generate2",authMiddleware,async(req,res)=>{
+    const {title,topic,noofQuestions}=req.body;
+
+    const structuredLlm = model.withStructuredOutput(multipleQuestionsSchema);
+    try {
+        // const {quizId,topic,noofQuestions}=req.body;
+        console.log("no of questions",noofQuestions);
+        console.log("Topic:", topic);
+        const userId = req.userId;
+        const newQuizCreation = Quizzes.create({
+            title:title,
+            description:topic,
+            userId:userId
+        });
+
+        const prompt = `You are a helpful AI assistant tasked with creating multiple-choice questions. Please generate ${noofQuestions} MCQ questions about ${topic}  `;    
+        console.log("Prompt:", prompt);
+        const modelResponse=await structuredLlm.invoke(prompt);
+        const [newQuiz,response]=await Promise.all([newQuizCreation,modelResponse]);
+        const quizId=newQuiz._id;
+        const myData=response.questions;
+        const questionsToInsert=myData.map((question,index)=>({
+            quizId:quizId,
+            questionText: question.question,
+            options:question.options,
+            correctAnswerIndex:question.correctAnswerIndex,
+            explanation:question.answer,
+            order:index+1
+        }));
+        console.log(questionsToInsert);
+        await Questions.insertMany(questionsToInsert);
+        const questions=await Questions.find({ quizId: quizId }).sort({ order: 1 });
+        console.log("The solution returned is:",questions);
+        if(questions)
+            return res.status(200).json({
+           quizId:quizId,
+           questions:questions
+        });
+        res.status(400).send("Internal Server error");
+    } catch (error) {
+        console.error("Error generating questions:", error.message);
+        res.status(500).send("Error generating questions");
+    }
 
 });
 

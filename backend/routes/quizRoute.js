@@ -56,14 +56,6 @@ quizRouter.get("/all",authMiddleware,async(req,res)=>{
     console.log(userId);
     console.log(title);
     try {
-        // const myQuizzes=await Quizzes.find({userId:userId
-        // });
-        // const query = { userId: userId };
-        // if (title) {
-        //     console.log("hii");
-        // query.title = { $regex: title, $options: 'i' };
-        // }
-        // const myQuizzes = await Quizzes.find({userId:userId});
         const queryconditions={userId:userId}
         if(title && title.trim()!==''){
             queryconditions.title={ $regex: title.trim(), $options: 'i' };
