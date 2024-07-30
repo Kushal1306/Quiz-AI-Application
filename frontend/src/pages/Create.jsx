@@ -75,7 +75,7 @@ function Create() {
             setQuizId(newQuizId);
             // setQuestions(generateQuestions.data);
             setQuestions(questions);
-            const myLink = `https://quiz-ai-app.vercel.app/play?quizId=${newQuizId}`;
+            const myLink = `https://www.quizai.tech/play?quizId=${newQuizId}`;
             setQuizLink(myLink);
         } catch (error) {
             console.error(error);

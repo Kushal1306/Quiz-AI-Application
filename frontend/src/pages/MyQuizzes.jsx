@@ -111,7 +111,7 @@ function MyQuizzes() {
                                     <div className="bg-gray-50 p-4 flex items-center justify-between">
                                     <button
                                   onClick={()=>{
-                                    setMyLink(`https://quiz-ai-app.vercel.app/play?quizId=${quiz._id}`)
+                                    setMyLink(`https://www.quizai.tech/play?quizId=${quiz._id}`)
                                     handleCopyToClipboard()
                                   }}
                                   className="flex items-center px-3 py-1 md:px-5 md:py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300"
