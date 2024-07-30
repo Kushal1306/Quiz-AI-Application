@@ -15,22 +15,12 @@ const port=process.env.port||3000;
 
 app.use(express.json());
 // app.use(cors());
-const allowedOrigins = ['http://localhost:5173', 'https://www.quizai.tech'];
+app.use(
+    cors({
+      origin: "*",
+    })
+);
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
-
-app.use(cors(corsOptions));
 
 // Handle preflight requests
 app.options('*', (req, res) => {
