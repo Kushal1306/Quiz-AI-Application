@@ -14,31 +14,7 @@ const app = express();
 const port=process.env.port||3000;
 
 app.use(express.json());
-// app.use(cors());
-// app.use(cors({
-//     origin: '*',
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//     allowedHeaders: ['Content-Type', 'Authorization']
-//   }));
-
-// Define the allowed origins
-const allowedOrigins = ['http://localhost:5173', 'https://www.quizai.tech'];
-
-// Set up CORS middleware with dynamic origin
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-// app.use("/user",UserRouter);
-// app.use("/quiz",quizRouter);
-// app.use("/question",questionRouter);
+app.use(cors());
 app.use(mainRouter);
 
 connectToDB()
