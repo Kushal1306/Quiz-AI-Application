@@ -15,23 +15,17 @@ const port=process.env.port||3000;
 
 app.use(express.json());
 // app.use(cors());
-app.use(
-    cors({
-      origin: "*",
-    })
-);
-
-
-// Handle preflight requests
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', allowedOrigins);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
-});
-
-
+const corsOptions = {
+    origin: ['http://localhost:5173', 'https://www.quizai.tech'], // Add your frontend domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200
+  };
+  
+app.use(cors(corsOptions));
+  
+  // Handle OPTIONS requests
+app.options('*', cors(corsOptions));
 app.use(mainRouter);
 
 connectToDB()
