@@ -156,7 +156,7 @@ UserRouter.post("/signin", async (req, res) => {
 });
 
 UserRouter.post("/google-signin",async(req,res)=>{
-  const token=req.body.token;a
+  const token=req.body.token;
   console.log(token);
   try {
     const ticket=await client.verifyIdToken({
