@@ -35,7 +35,7 @@ function LandingPage() {
         <button type="submit" className="w-7/12 rounded-full bg-black px-4 py-3 font-semibold text-white transition duration-300 hover:bg-gray-800 sm:w-auto sm:px-6 sm:py-3 sm:text-lg">Get Notified</button>
       </form>
       <p className="mt-4 text-sm text-gray-600 sm:text-sm">Be the first to know when we launch.</p> */}
-      <h1 className="mt-4 text-xl text-gray-600">Login to test it.</h1>
+      <h1 className="mt-4 text-xl text-gray-600">Login to Use it.</h1>
 
     </main>
   </div>

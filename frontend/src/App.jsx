@@ -67,14 +67,14 @@ import AppHeader from './pages/AppHeader';
 
 function HeaderWrapper() {
   const location = useLocation();
-  const headerPaths = ['/dashboard', '/create', '/play', '/take-a-quiz', '/image', '/leaderboard'];
+  const headerPaths = ['/dashboard', '/create',  '/take-a-quiz', '/image', '/leaderboard'];
   
   return headerPaths.includes(location.pathname) ? <AppHeader /> : null;
 }
 
 function MainContent() {
   const location = useLocation();
-  const headerPaths = ['/dashboard', '/create', '/play', '/take-a-quiz', '/image', '/leaderboard'];
+  const headerPaths = ['/dashboard', '/create', '/take-a-quiz', '/image', '/leaderboard'];
   
   return (
     <main className={`flex-grow ${headerPaths.includes(location.pathname) ? 'pt-16' : ''}`}>
