@@ -109,8 +109,8 @@ function TakeaQuiz() {
                         </div>
                         <button
                             type="submit"
-                            className="w-full bg-black text-white font-medium py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300 flex items-center justify-center space-x-2"
-                        >
+                            className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md hover:bg-blue-700 transition duration-300 flex items-center justify-center space-x-2"
+                            >
                             <Send className="w-4 h-4" />
                             <span>Generate Quiz</span>
                         </button>

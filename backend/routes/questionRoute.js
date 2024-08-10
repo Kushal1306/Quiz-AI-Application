@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import { z} from 'zod';
 import { ChatOpenAI } from "@langchain/openai";
 import Quizzes from '../models/Quizzes.js';
+import creditsMiddleware from '../middlewares/checkCredits.js';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -143,7 +144,7 @@ questionRouter.post("/generate", authMiddleware, async (req, res) => {
 
 });
 
-questionRouter.post("/generate2",authMiddleware,async(req,res)=>{
+questionRouter.post("/generate2",authMiddleware,creditsMiddleware,async(req,res)=>{
     const {title,topic,noofQuestions}=req.body;
 
     const structuredLlm = model.withStructuredOutput(multipleQuestionsSchema);

@@ -22,7 +22,7 @@ function Signin() {
                 password
             });
             localStorage.setItem("token",response.data.token);
-            navigate("/myQuizzes");
+            navigate("/dashboard");
             
         } catch (error) {
             console.log(error); 
@@ -38,7 +38,7 @@ function Signin() {
                 token:credentialResponse.credential,
             });
             localStorage.setItem("token",response.data.token);
-            navigate("/myQuizzes"); 
+            navigate("/dashboard"); 
         } catch (error) {
             console.error('Google Sign-In Error:', error);
         }

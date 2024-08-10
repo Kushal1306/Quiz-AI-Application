@@ -7,6 +7,7 @@ import { BottomWarning } from '../components/BottomWarning'
 import axios from 'axios';
 import { GoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
+import {jwtDecode} from 'jwt-decode';
 
 
 function Signup() {
@@ -25,23 +26,23 @@ function Signup() {
         lastName
       });
       localStorage.setItem("token",response.data.token);
-      navigate("/myQuizzes");
+      navigate("/dashboard");
 
     } catch (error) {
         console.error('Sign-up Error:', error);
     }
    
   };
-
   const handleGoogleSignIn=async(credentialResponse)=>{
     try {
         const decoded=jwtDecode(credentialResponse.credential);
         console.log(decoded);
-        const response=await axios.post("https://quiz-ai-backend.vercel.app/user/goole-signin",{
+
+        const response=await axios.post("https://quiz-ai-backend.vercel.app/user/google-signin",{
             token:credentialResponse.credential,
         });
         localStorage.setItem("token",response.data.token);
-        navigate("/myQuizzes"); 
+        navigate("/dashboard"); 
     } catch (error) {
         console.error('Google Sign-In Error:', error);
     }

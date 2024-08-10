@@ -68,9 +68,9 @@ function MyQuizzes() {
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
-            <AppHeader />
-            <main className="flex-grow pt-16 sm:pt-10">
-                <div className="container mx-auto px-4 py-8">
+            {/* <AppHeader /> */}
+            <main className="flex-grow pt-4 sm:pt-6">
+                <div className="container mx-auto px-4 py-2">
                     {showLeaderboard && (
                         <button 
                             onClick={handleBackToQuizzes}

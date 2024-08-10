@@ -1,408 +1,1108 @@
 import React, { useState } from "react";
-import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, PlusCircle,Clipboard } from 'lucide-react';
+import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, Clipboard, Download } from 'lucide-react';
 import axios from 'axios';
 
-function Create() {
-    const [title, setTitle] = useState("");
-    const [topic, setTopicName] = useState("");
-    const [noofQuestions, setNoofQuestions] = useState(5);
-    const [buttonGenerate, setButtonGenerate] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [quizId, setQuizId] = useState("");
-    const [questions, setQuestions] = useState([]);
-    const [editingQuestionId, setEditingQuestionId] = useState(null);
-    const [editedQuestion, setEditedQuestion] = useState({});
-    const [expandedQuestionId, setExpandedQuestionId] = useState(null);
-    const [quizLink,setQuizLink]=useState("");
-    const [copySuccess,setCopySuccess]=useState("");
+const Create = () => {
+  const [title, setTitle] = useState("");
+  const [topic, setTopic] = useState("");
+  const [noofQuestions, setNoofQuestions] = useState(5);
+  const [loading, setLoading] = useState(false);
+  const [quizId, setQuizId] = useState("");
+  const [questions, setQuestions] = useState([]);
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [editedQuestion, setEditedQuestion] = useState({});
+  const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+  const [quizLink, setQuizLink] = useState("");
+  const [copySuccess, setCopySuccess] = useState("");
 
-
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     setLoading(true);
-    //     setButtonGenerate(false);
-    //     const token = localStorage.getItem("token");
-    //     try {
-    //         const response = await axios.post("https://quiz-ai-backend.vercel.app/quiz/create-quiz", {
-    //             title,
-    //             topic
-    //         }, {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         });
-    //         const newQuizId = response.data.quizId;
-    //         setQuizId(newQuizId);
-
-    //         const generateQuestions = await axios.post("https://quiz-ai-backend.vercel.app/question/generate", {
-    //             quizId: newQuizId,
-    //             topic,
-    //             noofQuestions
-    //         }, {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         });
-    //         setQuestions(generateQuestions.data);
-    //         const myLink=`https://quiz-ai-app.vercel.app/play?quizId=${newQuizId}`
-    //         setQuizLink(myLink);
-    //     } catch (error) {
-    //         console.error(error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setButtonGenerate(false);
-        const token = localStorage.getItem("token");
-        try {
-            const response = await axios.post("https://quiz-ai-backend.vercel.app/question/generate2", {
-                title,
-                topic,
-                noofQuestions
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            const newQuizId = response.data.quizId;
-            const questions=response.data.questions;
-            setQuizId(newQuizId);
-            // setQuestions(generateQuestions.data);
-            setQuestions(questions);
-            const myLink = `https://www.quizai.tech/play?quizId=${newQuizId}`;
-            setQuizLink(myLink);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.post("http://localhost:3000/question/generate2", {
+        title,
+        topic,
+        noofQuestions
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-    };
+      });
+      const newQuizId = response.data.quizId;
+      const generatedQuestions = response.data.questions;
+      setQuizId(newQuizId);
+      setQuestions(generatedQuestions);
+      setQuizLink(`https://www.quizai.tech/play?quizId=${newQuizId}`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleEdit = (question) => {
-        setEditingQuestionId(question._id);
-        setEditedQuestion({ ...question });
-    };
+  const handleEdit = (question) => {
+    setEditingQuestionId(question._id);
+    setEditedQuestion({ ...question });
+  };
 
-    const handleSave = async (questionId) => {
-        const token = localStorage.getItem("token");
-        try {
-            const response = await axios.put(`https://quiz-ai-backend.vercel.app/question/${questionId}`, editedQuestion, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            setQuestions(questions.map(q => q._id === questionId ? response.data : q));
-            setEditingQuestionId(null);
-        } catch (error) {
-            console.error(error);
+  const handleSave = async (questionId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.put(`https://quiz-ai-backend.vercel.app/question/${questionId}`, editedQuestion, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-    };
+      });
+      setQuestions(questions.map(q => q._id === questionId ? response.data : q));
+      setEditingQuestionId(null);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    const handleCancel = () => {
-        setEditingQuestionId(null);
-    };
+  const handleCancel = () => {
+    setEditingQuestionId(null);
+  };
 
-    const handleEditChange = (e, index) => {
-        const { name, value } = e.target;
-        setEditedQuestion(prev => {
-            if (name === 'options') {
-                const newOptions = [...prev.options];
-                newOptions[index] = value;
-                return { ...prev, options: newOptions };
-            } else if (name === 'correctAnswerIndex') {
-                return { ...prev, correctAnswerIndex: parseInt(value) };
-            } else {
-                return { ...prev, [name]: value };
-            }
-        });
-    };
+  const handleEditChange = (e, index) => {
+    const { name, value } = e.target;
+    setEditedQuestion(prev => {
+      if (name === 'options') {
+        const newOptions = [...prev.options];
+        newOptions[index] = value;
+        return { ...prev, options: newOptions };
+      } else if (name === 'correctAnswerIndex') {
+        return { ...prev, correctAnswerIndex: parseInt(value) };
+      } else {
+        return { ...prev, [name]: value };
+      }
+    });
+  };
 
-    const toggleExplanation = (questionId) => {
-        setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
-    };
+  const toggleExplanation = (questionId) => {
+    setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
+  };
 
-    const handleDelete = async (questionId) => {
-        const token = localStorage.getItem("token");
-        try {
-            await axios.delete(`https://quiz-ai-backend.vercel.app/question/${questionId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            setQuestions(questions.filter(q => q._id !== questionId));
-        } catch (error) {
-            console.error(error);
+  const handleDelete = async (questionId) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`https://quiz-ai-backend.vercel.app/question/${questionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-    };
+      });
+      setQuestions(questions.filter(q => q._id !== questionId));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    const handleAddQuestion = async () => {
-        const token = localStorage.getItem("token");
-        const newQuestion = {
-            quizId: quizId,
-            questionText: "",
-            options: ["", "", "", ""],
-            correctAnswerIndex: 0,
-            explanation: ""
-        };
-        try {
-            const response = await axios.post("https://quiz-ai-backend.vercel.app/question", newQuestion, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            setQuestions([...questions, response.data]);
-            setEditingQuestionId(response.data._id);
-            setEditedQuestion(response.data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(quizLink);
+      setCopySuccess("Copied!");
+      setTimeout(() => setCopySuccess(""), 2000);
+    } catch (error) {
+      console.error("Failed to copy: ", error);
+      setCopySuccess("Failed to copy!");
+      setTimeout(() => setCopySuccess(""), 2000);
+    }
+  };
 
-    const handleCopyToClipboard = async () => {
-        try {
-            await navigator.clipboard.writeText(quizLink);
-            setCopySuccess("Copied!");
-            setTimeout(() => setCopySuccess(""), 2000); // Clear the message after 2 seconds
-        } catch (error) {
-            console.error("Failed to copy: ", error);
-            setCopySuccess("Failed to copy!");
-            setTimeout(() => setCopySuccess(""), 2000); // Clear the message after 2 seconds
-        }
-    };
+  const handleDownload = () => {
+    const dataStr = JSON.stringify(questions, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileDefaultName = `${title || 'quiz'}_questions.json`;
 
-    return (
-        <div className="p-4 bg-white min-h-screen">
-            <div className="max-w-3xl mx-auto">
-            
-                {buttonGenerate && (
-                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
-                        <form onSubmit={handleSubmit} className="p-4 space-y-3">
-                            <div>
-                                <label htmlFor="title" className="block text-sm font-medium mb-1 text-gray-700">
-                                    <Captions className="inline w-4 h-4 mr-1" />
-                                    Title
-                                </label>
-                                <input
-                                    id="title"
-                                    type="text"
-                                    className="w-full p-2 text-sm border border-gray-300 rounded-md text-black"
-                                    placeholder="Enter Title ex: A Quiz on India"
-                                    required
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="topic" className="block text-sm font-medium mb-1 text-gray-700">
-                                    <BookOpen className="inline w-4 h-4 mr-1" />
-                                    Topic Name
-                                </label>
-                                <input
-                                    id="topic"
-                                    type="text"
-                                    className="w-full p-2 text-sm border border-gray-300 rounded-md text-black"
-                                    placeholder="Ex: India"
-                                    required
-                                    value={topic}
-                                    onChange={(e) => setTopicName(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="noofQuestions" className="block text-sm font-medium mb-1 text-gray-700">
-                                    <ListOrdered className="inline w-4 h-4 mr-1" />
-                                    Number of Questions
-                                </label>
-                                <input
-                                    id="noofQuestions"
-                                    type="number"
-                                    className="w-full p-2 text-sm border border-gray-300 rounded-md text-black"
-                                    placeholder="Number"
-                                    max={10}
-                                    required
-                                    value={noofQuestions}
-                                    onChange={(e) => setNoofQuestions(e.target.value)}
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                className="w-full bg-black text-white font-medium py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300 flex items-center justify-center space-x-2"
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <span>Generating...</span>
-                                ) : (
-                                    <>
-                                        <Send className="w-4 h-4" />
-                                        <span>Generate Quiz</span>
-                                    </>
-                                )}
-                            </button>
-                        </form>
-                    </div>
-                )}
-                {questions.length > 0 && (
-                    <div className="space-y-4">
-                        {quizLink && (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex items-center justify-between">
-        <span className="text-sm font-medium text-black truncate flex-grow mr-4">{title}</span>
-        <button
-            onClick={handleCopyToClipboard}
-            className="flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
-        >
-            <Clipboard className="w-4 h-4 mr-1" />
-            Copy Link
-        </button>
-    </div>
-)}
-{copySuccess && (
-    <div className={`mt-2 p-2 text-sm rounded-md ${copySuccess === "Copied!" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-        {copySuccess}
-    </div>
-)}
-                        {questions.map((question, index) => (
-                            <div key={question._id} className="bg-white border border-gray-200 rounded-lg shadow-sm">
-                                <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
-                                    <h3 className="text-md font-semibold text-black">
-                                        Q {index + 1}
-                                    </h3>
-                                    <div className="flex space-x-2">
-                                        <button
-                                            onClick={() => handleEdit(question)}
-                                            className="flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
-                                        >
-                                            <Edit3 className="w-4 h-4 mr-1" />
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(question._id)}
-                                            className="flex items-center px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300"
-                                        >
-                                            <Trash className="w-4 h-4 mr-1" />
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="p-4">
-                                    {editingQuestionId === question._id ? (
-                                        <div className="space-y-3">
-                                            <input
-                                                type="text"
-                                                name="questionText"
-                                                value={editedQuestion.questionText}
-                                                onChange={handleEditChange}
-                                                className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black text-black"
-                                            />
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                {editedQuestion.options.map((option, idx) => (
-                                                    <div key={idx} className="flex items-center">
-                                                        <input
-                                                            type="radio"
-                                                            name="correctAnswerIndex"
-                                                            value={idx}
-                                                            checked={idx === editedQuestion.correctAnswerIndex}
-                                                            onChange={handleEditChange}
-                                                            className="mr-2"
-                                                        />
-                                                        <input
-                                                            type="text"
-                                                            name="options"
-                                                            value={option}
-                                                            onChange={(e) => handleEditChange(e, idx)}
-                                                            className="flex-grow p-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black text-black"
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <textarea
-                                                name="explanation"
-                                                value={editedQuestion.explanation}
-                                                onChange={handleEditChange}
-                                                className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black text-black"
-                                                rows="2"
-                                            />
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => handleSave(question._id)}
-                                                    className="flex items-center px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
-                                                >
-                                                    <Save className="w-4 h-4 mr-1" />
-                                                    Save
-                                                </button>
-                                                <button
-                                                    onClick={handleCancel}
-                                                    className="flex items-center px-3 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-300 transition duration-300"
-                                                >
-                                                    <X className="w-4 h-4 mr-1" />
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-3">
-                                            <p className="text-sm font-medium text-black">{question.questionText}</p>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                {question.options.map((option, idx) => (
-                                                    <div
-                                                        key={idx}
-                                                        className={`flex items-center p-2 rounded-md transition-all duration-300 cursor-pointer text-sm ${
-                                                            idx === question.correctAnswerIndex
-                                                                ? 'bg-black text-white'
-                                                                : 'bg-gray-100 text-black hover:bg-gray-200'
-                                                        }`}
-                                                    >
-                                                        <span className="mr-2">{idx + 1}.</span>
-                                                        <p>{option}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <div>
-                                                <button
-                                                    onClick={() => toggleExplanation(question._id)}
-                                                    className="w-full flex justify-between items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition duration-300 text-black text-sm"
-                                                >
-                                                    <span className="font-medium">Explanation</span>
-                                                    {expandedQuestionId === question._id ? (
-                                                        <ChevronUp className="w-4 h-4" />
-                                                    ) : (
-                                                        <ChevronDown className="w-4 h-4" />
-                                                    )}
-                                                </button>
-                                                {expandedQuestionId === question._id && (
-                                                    <div className="mt-2 p-2 bg-gray-50 rounded-md">
-                                                        <p className="text-gray-700 text-sm">{question.explanation}</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                        <div className="mt-4">
-                            <button
-                                onClick={handleAddQuestion}
-                                className="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300"
-                            >
-                                <PlusCircle className="w-4 h-4 mr-2" />
-                                Add New Question
-                            </button>
-                        </div>
-                    </div>
-                )}
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  };
+
+  return (
+<div className="flex flex-col md:flex-row h-screen bg-gradient-to-br from-gray-50 to-gray-200 text-gray-800">
+      {/* Left side - Quiz Creation Form (Fixed) */}
+      <div className="w-full md:w-2/5 p-6 flex items-center justify-center overflow-y-auto bg-white shadow-lg">
+        <div className="w-full max-w-md">
+          <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Create Your Quiz</h2>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium mb-1">
+                <Captions className="inline w-4 h-4 mr-1" />
+                Title
+              </label>
+              <input
+                id="title"
+                type="text"
+                className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter Title ex: A Quiz on India"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </div>
+            <div>
+              <label htmlFor="topic" className="block text-sm font-medium mb-1">
+                <BookOpen className="inline w-4 h-4 mr-1" />
+                Topic Name
+              </label>
+              <input
+                id="topic"
+                type="text"
+                className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Ex: India"
+                required
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="noofQuestions" className="block text-sm font-medium mb-1">
+                <ListOrdered className="inline w-4 h-4 mr-1" />
+                Number of Questions
+              </label>
+              <input
+                id="noofQuestions"
+                type="number"
+                className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Number"
+                max={10}
+                required
+                value={noofQuestions}
+                onChange={(e) => setNoofQuestions(e.target.value)}
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md hover:bg-blue-700 transition duration-300 flex items-center justify-center space-x-2"
+              disabled={loading}
+            >
+              {loading ? (
+                <span>Generating...</span>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  <span>Generate Quiz</span>
+                </>
+              )}
+            </button>
+          </form>
         </div>
-    );
-}
+      </div>
+
+      {/* Right side - Generated Questions or Instructions (Scrollable) */}
+      <div className="w-full md:w-3/5 overflow-y-auto">
+        <div className="p-6 space-y-6">
+          {questions.length > 0 ? (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">{title || 'Generated Quiz'}</h2>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleCopyToClipboard}
+                    className="flex items-center px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+                  >
+                    <Clipboard className="w-4 h-4 mr-2" />
+                    Copy Link
+                  </button>
+                  <button
+                    onClick={handleDownload}
+                    className="flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </button>
+                </div>
+              </div>
+              {copySuccess && (
+                <div className={`mb-4 p-2 text-sm rounded-md ${copySuccess === "Copied!" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                  {copySuccess}
+                </div>
+              )}
+              {questions.map((question, index) => (
+                <div key={question._id} className="bg-white shadow-lg rounded-lg overflow-hidden mb-6 transition-all duration-300 hover:shadow-xl">
+                  <div className="bg-gray-700 px-4 py-3 border-b border-gray-700 flex justify-between items-center">
+                    <h3 className="text-lg font-semibold text-white">
+                      Question {index + 1}
+                    </h3>
+                    {/* <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(question)}
+                        className="flex items-center px-3 py-1 text-sm bg-white text-black rounded-md  transition duration-300"
+                      >
+                        <Edit3 className="w-4 h-4 mr-1" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(question._id)}
+                        className="flex items-center px-3 py-1 text-sm bg-white text-black rounded-md hover:bg-red-600 transition duration-300"
+                      >
+                        <Trash className="w-4 h-4 mr-1" />
+                        Delete
+                      </button>
+                    </div> */}
+                  </div>
+                  <div className="p-4">
+                    {editingQuestionId === question._id ? (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          name="questionText"
+                          value={editedQuestion.questionText}
+                          onChange={handleEditChange}
+                          className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {editedQuestion.options.map((option, idx) => (
+                            <div key={idx} className="flex items-center">
+                              <input
+                                type="radio"
+                                name="correctAnswerIndex"
+                                value={idx}
+                                checked={idx === editedQuestion.correctAnswerIndex}
+                                onChange={handleEditChange}
+                                className="mr-2"
+                              />
+                              <input
+                                type="text"
+                                name="options"
+                                value={option}
+                                onChange={(e) => handleEditChange(e, idx)}
+                                className="flex-grow p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <textarea
+                          name="explanation"
+                          value={editedQuestion.explanation}
+                          onChange={handleEditChange}
+                          className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          rows="2"
+                        />
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleSave(question._id)}
+                            className="flex items-center px-3 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300"
+                          >
+                            <Save className="w-4 h-4 mr-1" />
+                            Save
+                          </button>
+                          <button
+                            onClick={handleCancel}
+                            className="flex items-center px-3 py-1 text-sm bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition duration-300"
+                          >
+                            <X className="w-4 h-4 mr-1" />
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <p className="text-lg font-medium">{question.questionText}</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {question.options.map((option, idx) => (
+                            <div
+                              key={idx}
+                              className={`flex items-center p-3 rounded-md transition-all duration-300 cursor-pointer ${
+                                idx === question.correctAnswerIndex
+                                  ? 'bg-green-100 text-green-800 font-semibold'
+                                  : 'bg-gray-100 hover:bg-gray-200'
+                              }`}
+                            >
+                              <span className="mr-2 font-bold">{String.fromCharCode(65 + idx)}.</span>
+                              <p>{option}</p>
+                            </div>
+                          ))}
+                        </div>
+                        <div>
+                          <button
+                            onClick={() => toggleExplanation(question._id)}
+                            className="w-full flex justify-between items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition duration-300 font-medium"
+                          >
+                            <span>Explanation</span>
+                            {expandedQuestionId === question._id ? (
+                              <ChevronUp className="w-5 h-5" />
+                            ) : (
+                              <ChevronDown className="w-5 h-5" />
+                            )}
+                          </button>
+                          {expandedQuestionId === question._id && (
+                            <div className="mt-2 p-3 bg-blue-50 rounded-md">
+                              <p className="text-sm text-blue-800">{question.explanation}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-full mt-60">
+              <p className="text-xl text-gray-600">
+                Enter relevant details on the left to generate your quiz.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Create;
+// import React, { useState } from "react";
+// import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, PlusCircle, Clipboard } from 'lucide-react';
+// import axios from 'axios';
+
+// const Create = () => {
+//   const [title, setTitle] = useState("");
+//   const [topic, setTopic] = useState("");
+//   const [noofQuestions, setNoofQuestions] = useState(5);
+//   const [loading, setLoading] = useState(false);
+//   const [quizId, setQuizId] = useState("");
+//   const [questions, setQuestions] = useState([]);
+//   const [editingQuestionId, setEditingQuestionId] = useState(null);
+//   const [editedQuestion, setEditedQuestion] = useState({});
+//   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+//   const [quizLink, setQuizLink] = useState("");
+//   const [copySuccess, setCopySuccess] = useState("");
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     const token = localStorage.getItem("token");
+//     try {
+//       const response = await axios.post("https://quiz-ai-backend.vercel.app/question/generate2", {
+//         title,
+//         topic,
+//         noofQuestions
+//       }, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           'Content-Type': 'application/json'
+//         }
+//       });
+//       const newQuizId = response.data.quizId;
+//       const generatedQuestions = response.data.questions;
+//       setQuizId(newQuizId);
+//       setQuestions(generatedQuestions);
+//       setQuizLink(`https://www.quizai.tech/play?quizId=${newQuizId}`);
+//     } catch (error) {
+//       console.error(error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleEdit = (question) => {
+//     setEditingQuestionId(question._id);
+//     setEditedQuestion({ ...question });
+//   };
+
+//   const handleSave = async (questionId) => {
+//     const token = localStorage.getItem("token");
+//     try {
+//       const response = await axios.put(`https://quiz-ai-backend.vercel.app/question/${questionId}`, editedQuestion, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           'Content-Type': 'application/json'
+//         }
+//       });
+//       setQuestions(questions.map(q => q._id === questionId ? response.data : q));
+//       setEditingQuestionId(null);
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   };
+
+//   const handleCancel = () => {
+//     setEditingQuestionId(null);
+//   };
+
+//   const handleEditChange = (e, index) => {
+//     const { name, value } = e.target;
+//     setEditedQuestion(prev => {
+//       if (name === 'options') {
+//         const newOptions = [...prev.options];
+//         newOptions[index] = value;
+//         return { ...prev, options: newOptions };
+//       } else if (name === 'correctAnswerIndex') {
+//         return { ...prev, correctAnswerIndex: parseInt(value) };
+//       } else {
+//         return { ...prev, [name]: value };
+//       }
+//     });
+//   };
+
+//   const toggleExplanation = (questionId) => {
+//     setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
+//   };
+
+//   const handleDelete = async (questionId) => {
+//     const token = localStorage.getItem("token");
+//     try {
+//       await axios.delete(`https://quiz-ai-backend.vercel.app/question/${questionId}`, {
+//         headers: {
+//           Authorization: `Bearer ${token}`
+//         }
+//       });
+//       setQuestions(questions.filter(q => q._id !== questionId));
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   };
+
+//   const handleCopyToClipboard = async () => {
+//     try {
+//       await navigator.clipboard.writeText(quizLink);
+//       setCopySuccess("Copied!");
+//       setTimeout(() => setCopySuccess(""), 2000);
+//     } catch (error) {
+//       console.error("Failed to copy: ", error);
+//       setCopySuccess("Failed to copy!");
+//       setTimeout(() => setCopySuccess(""), 2000);
+//     }
+//   };
+
+//   return (
+//     <div className="flex flex-col md:flex-row h-screen bg-white text-black">
+//     {/* Left side - Quiz Creation Form (Fixed) */}
+//     <div className="w-full md:w-2/5 p-6 flex items-center justify-center overflow-y-auto">
+//       <div className="w-full max-w-md">
+//         <h2 className="text-2xl font-bold mb-6 text-center">Create Your Quiz</h2>
+//         <form onSubmit={handleSubmit} className="space-y-4">
+//           <div>
+//             <label htmlFor="title" className="block text-sm font-medium mb-1">
+//               <Captions className="inline w-4 h-4 mr-1" />
+//               Title
+//             </label>
+//             <input
+//               id="title"
+//               type="text"
+//               className="w-full p-2 text-sm border border-black rounded-md"
+//               placeholder="Enter Title ex: A Quiz on India"
+//               required
+//               value={title}
+//               onChange={(e) => setTitle(e.target.value)}
+//             />
+//           </div>
+//           <div>
+//             <label htmlFor="topic" className="block text-sm font-medium mb-1">
+//               <BookOpen className="inline w-4 h-4 mr-1" />
+//               Topic Name
+//             </label>
+//             <input
+//               id="topic"
+//               type="text"
+//               className="w-full p-2 text-sm border border-black rounded-md"
+//               placeholder="Ex: India"
+//               required
+//               value={topic}
+//               onChange={(e) => setTopic(e.target.value)}
+//             />
+//           </div>
+//           <div>
+//             <label htmlFor="noofQuestions" className="block text-sm font-medium mb-1">
+//               <ListOrdered className="inline w-4 h-4 mr-1" />
+//               Number of Questions
+//             </label>
+//             <input
+//               id="noofQuestions"
+//               type="number"
+//               className="w-full p-2 text-sm border border-black rounded-md"
+//               placeholder="Number"
+//               max={10}
+//               required
+//               value={noofQuestions}
+//               onChange={(e) => setNoofQuestions(e.target.value)}
+//             />
+//           </div>
+//           <button
+//             type="submit"
+//             className="w-full bg-black text-white font-medium py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300 flex items-center justify-center space-x-2"
+//             disabled={loading}
+//           >
+//             {loading ? (
+//               <span>Generating...</span>
+//             ) : (
+//               <>
+//                 <Send className="w-4 h-4" />
+//                 <span>Generate Quiz</span>
+//               </>
+//             )}
+//           </button>
+//         </form>
+//       </div>
+//     </div>
+
+//     {/* Right side - Generated Questions or Instructions (Scrollable) */}
+//     <div className="w-full md:w-3/5 bg-gray-100 overflow-y-auto">
+//       <div className="p-6 space-y-6">
+//         {questions.length > 0 ? (
+//           <>
+//             {quizLink && (
+//               <div className="bg-white shadow-md rounded-lg p-4 flex items-center justify-between">
+//                 <span className="text-sm font-medium truncate flex-grow mr-4">{title}</span>
+//                 <button
+//                   onClick={handleCopyToClipboard}
+//                   className="flex items-center px-3 py-2 text-sm bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
+//                 >
+//                   <Clipboard className="w-4 h-4 mr-1" />
+//                   Copy Link
+//                 </button>
+//               </div>
+//             )}
+//             {copySuccess && (
+//               <div className={`mt-2 p-2 text-sm rounded-md ${copySuccess === "Copied!" ? "bg-gray-200" : "bg-gray-300"}`}>
+//                 {copySuccess}
+//               </div>
+//             )}
+//             {questions.map((question, index) => (
+//               <div key={question._id} className="bg-white shadow-md rounded-lg overflow-hidden">
+//                 <div className="bg-gray-200 px-4 py-3 border-b border-gray-300 flex justify-between items-center">
+//                   <h3 className="text-md font-semibold">
+//                     Q {index + 1}
+//                   </h3>
+//                   <div className="flex space-x-2">
+//                     <button
+//                       onClick={() => handleEdit(question)}
+//                       className="flex items-center px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
+//                     >
+//                       <Edit3 className="w-4 h-4 mr-1" />
+//                       Edit
+//                     </button>
+//                     <button
+//                       onClick={() => handleDelete(question._id)}
+//                       className="flex items-center px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition duration-300"
+//                     >
+//                       <Trash className="w-4 h-4 mr-1" />
+//                       Delete
+//                     </button>
+//                   </div>
+//                 </div>
+//                 <div className="p-4">
+//                   {editingQuestionId === question._id ? (
+//                     <div className="space-y-3">
+//                       <input
+//                         type="text"
+//                         name="questionText"
+//                         value={editedQuestion.questionText}
+//                         onChange={handleEditChange}
+//                         className="w-full p-2 text-sm border border-gray-300 rounded-md"
+//                       />
+//                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+//                         {editedQuestion.options.map((option, idx) => (
+//                           <div key={idx} className="flex items-center">
+//                             <input
+//                               type="radio"
+//                               name="correctAnswerIndex"
+//                               value={idx}
+//                               checked={idx === editedQuestion.correctAnswerIndex}
+//                               onChange={handleEditChange}
+//                               className="mr-2"
+//                             />
+//                             <input
+//                               type="text"
+//                               name="options"
+//                               value={option}
+//                               onChange={(e) => handleEditChange(e, idx)}
+//                               className="flex-grow p-2 text-sm border border-gray-300 rounded-md"
+//                             />
+//                           </div>
+//                         ))}
+//                       </div>
+//                       <textarea
+//                         name="explanation"
+//                         value={editedQuestion.explanation}
+//                         onChange={handleEditChange}
+//                         className="w-full p-2 text-sm border border-gray-300 rounded-md"
+//                         rows="2"
+//                       />
+//                       <div className="flex space-x-2">
+//                         <button
+//                           onClick={() => handleSave(question._id)}
+//                           className="flex items-center px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
+//                         >
+//                           <Save className="w-4 h-4 mr-1" />
+//                           Save
+//                         </button>
+//                         <button
+//                           onClick={handleCancel}
+//                           className="flex items-center px-3 py-1 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300"
+//                         >
+//                           <X className="w-4 h-4 mr-1" />
+//                           Cancel
+//                         </button>
+//                       </div>
+//                     </div>
+//                   ) : (
+//                     <div className="space-y-3">
+//                       <p className="text-sm font-medium">{question.questionText}</p>
+//                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+//                         {question.options.map((option, idx) => (
+//                           <div
+//                             key={idx}
+//                             className={`flex items-center p-2 rounded-md transition-all duration-300 cursor-pointer text-sm ${
+//                               idx === question.correctAnswerIndex
+//                                 ? 'bg-gray-200 font-semibold'
+//                                 : 'bg-gray-100 hover:bg-gray-200'
+//                             }`}
+//                           >
+//                             <span className="mr-2">{idx + 1}.</span>
+//                             <p>{option}</p>
+//                           </div>
+//                         ))}
+//                       </div>
+//                       <div>
+//                         <button
+//                           onClick={() => toggleExplanation(question._id)}
+//                           className="w-full flex justify-between items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition duration-300 text-sm"
+//                         >
+//                           <span className="font-medium">Explanation</span>
+//                           {expandedQuestionId === question._id ? (
+//                             <ChevronUp className="w-4 h-4" />
+//                           ) : (
+//                             <ChevronDown className="w-4 h-4" />
+//                           )}
+//                         </button>
+//                         {expandedQuestionId === question._id && (
+//                           <div className="mt-2 p-2 bg-gray-50 rounded-md">
+//                             <p className="text-sm">{question.explanation}</p>
+//                           </div>
+//                         )}
+//                       </div>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+//             ))}
+//           </>
+//         ) : (
+//           <div className="flex items-center justify-center h-full">
+//             <p className="text-xl text-gray-600">
+//               Enter relevant details on the left to generate your quiz.
+//             </p>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   </div>
+//   );
+// };
+
+// export default Create;
+// import React, { useState } from "react";
+// import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, PlusCircle,Clipboard } from 'lucide-react';
+// import axios from 'axios';
+
+// function Create() {
+//     const [title, setTitle] = useState("");
+//     const [topic, setTopicName] = useState("");
+//     const [noofQuestions, setNoofQuestions] = useState(5);
+//     const [buttonGenerate, setButtonGenerate] = useState(true);
+//     const [loading, setLoading] = useState(false);
+//     const [quizId, setQuizId] = useState("");
+//     const [questions, setQuestions] = useState([]);
+//     const [editingQuestionId, setEditingQuestionId] = useState(null);
+//     const [editedQuestion, setEditedQuestion] = useState({});
+//     const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+//     const [quizLink,setQuizLink]=useState("");
+//     const [copySuccess,setCopySuccess]=useState("");
+
+
+//     // const handleSubmit = async (e) => {
+//     //     e.preventDefault();
+//     //     setLoading(true);
+//     //     setButtonGenerate(false);
+//     //     const token = localStorage.getItem("token");
+//     //     try {
+//     //         const response = await axios.post("https://quiz-ai-backend.vercel.app/quiz/create-quiz", {
+//     //             title,
+//     //             topic
+//     //         }, {
+//     //             headers: {
+//     //                 Authorization: `Bearer ${token}`,
+//     //                 'Content-Type': 'application/json'
+//     //             }
+//     //         });
+//     //         const newQuizId = response.data.quizId;
+//     //         setQuizId(newQuizId);
+
+//     //         const generateQuestions = await axios.post("https://quiz-ai-backend.vercel.app/question/generate", {
+//     //             quizId: newQuizId,
+//     //             topic,
+//     //             noofQuestions
+//     //         }, {
+//     //             headers: {
+//     //                 Authorization: `Bearer ${token}`,
+//     //                 'Content-Type': 'application/json'
+//     //             }
+//     //         });
+//     //         setQuestions(generateQuestions.data);
+//     //         const myLink=`https://quiz-ai-app.vercel.app/play?quizId=${newQuizId}`
+//     //         setQuizLink(myLink);
+//     //     } catch (error) {
+//     //         console.error(error);
+//     //     } finally {
+//     //         setLoading(false);
+//     //     }
+//     // };
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         setLoading(true);
+//         setButtonGenerate(false);
+//         const token = localStorage.getItem("token");
+//         try {
+//             const response = await axios.post("https://quiz-ai-backend.vercel.app/question/generate2", {
+//                 title,
+//                 topic,
+//                 noofQuestions
+//             }, {
+//                 headers: {
+//                     Authorization: `Bearer ${token}`,
+//                     'Content-Type': 'application/json'
+//                 }
+//             });
+//             const newQuizId = response.data.quizId;
+//             const questions=response.data.questions;
+//             setQuizId(newQuizId);
+//             // setQuestions(generateQuestions.data);
+//             setQuestions(questions);
+//             const myLink = `https://www.quizai.tech/play?quizId=${newQuizId}`;
+//             setQuizLink(myLink);
+//         } catch (error) {
+//             console.error(error);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     const handleEdit = (question) => {
+//         setEditingQuestionId(question._id);
+//         setEditedQuestion({ ...question });
+//     };
+
+//     const handleSave = async (questionId) => {
+//         const token = localStorage.getItem("token");
+//         try {
+//             const response = await axios.put(`https://quiz-ai-backend.vercel.app/question/${questionId}`, editedQuestion, {
+//                 headers: {
+//                     Authorization: `Bearer ${token}`,
+//                     'Content-Type': 'application/json'
+//                 }
+//             });
+//             setQuestions(questions.map(q => q._id === questionId ? response.data : q));
+//             setEditingQuestionId(null);
+//         } catch (error) {
+//             console.error(error);
+//         }
+//     };
+
+//     const handleCancel = () => {
+//         setEditingQuestionId(null);
+//     };
+
+//     const handleEditChange = (e, index) => {
+//         const { name, value } = e.target;
+//         setEditedQuestion(prev => {
+//             if (name === 'options') {
+//                 const newOptions = [...prev.options];
+//                 newOptions[index] = value;
+//                 return { ...prev, options: newOptions };
+//             } else if (name === 'correctAnswerIndex') {
+//                 return { ...prev, correctAnswerIndex: parseInt(value) };
+//             } else {
+//                 return { ...prev, [name]: value };
+//             }
+//         });
+//     };
+
+//     const toggleExplanation = (questionId) => {
+//         setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
+//     };
+
+//     const handleDelete = async (questionId) => {
+//         const token = localStorage.getItem("token");
+//         try {
+//             await axios.delete(`https://quiz-ai-backend.vercel.app/question/${questionId}`, {
+//                 headers: {
+//                     Authorization: `Bearer ${token}`
+//                 }
+//             });
+//             setQuestions(questions.filter(q => q._id !== questionId));
+//         } catch (error) {
+//             console.error(error);
+//         }
+//     };
+
+//     const handleAddQuestion = async () => {
+//         const token = localStorage.getItem("token");
+//         const newQuestion = {
+//             quizId: quizId,
+//             questionText: "",
+//             options: ["", "", "", ""],
+//             correctAnswerIndex: 0,
+//             explanation: ""
+//         };
+//         try {
+//             const response = await axios.post("https://quiz-ai-backend.vercel.app/question", newQuestion, {
+//                 headers: {
+//                     Authorization: `Bearer ${token}`,
+//                     'Content-Type': 'application/json'
+//                 }
+//             });
+//             setQuestions([...questions, response.data]);
+//             setEditingQuestionId(response.data._id);
+//             setEditedQuestion(response.data);
+//         } catch (error) {
+//             console.error(error);
+//         }
+//     };
+
+//     const handleCopyToClipboard = async () => {
+//         try {
+//             await navigator.clipboard.writeText(quizLink);
+//             setCopySuccess("Copied!");
+//             setTimeout(() => setCopySuccess(""), 2000); // Clear the message after 2 seconds
+//         } catch (error) {
+//             console.error("Failed to copy: ", error);
+//             setCopySuccess("Failed to copy!");
+//             setTimeout(() => setCopySuccess(""), 2000); // Clear the message after 2 seconds
+//         }
+//     };
+
+//     return (
+//         <div className="p-4 bg-white min-h-screen">
+//             <div className="max-w-3xl mx-auto">
+            
+//                 {buttonGenerate && (
+//                     <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
+//                         <form onSubmit={handleSubmit} className="p-4 space-y-3">
+//                             <div>
+//                                 <label htmlFor="title" className="block text-sm font-medium mb-1 text-gray-700">
+//                                     <Captions className="inline w-4 h-4 mr-1" />
+//                                     Title
+//                                 </label>
+//                                 <input
+//                                     id="title"
+//                                     type="text"
+//                                     className="w-full p-2 text-sm border border-gray-300 rounded-md text-black"
+//                                     placeholder="Enter Title ex: A Quiz on India"
+//                                     required
+//                                     value={title}
+//                                     onChange={(e) => setTitle(e.target.value)}
+//                                 />
+//                             </div>
+//                             <div>
+//                                 <label htmlFor="topic" className="block text-sm font-medium mb-1 text-gray-700">
+//                                     <BookOpen className="inline w-4 h-4 mr-1" />
+//                                     Topic Name
+//                                 </label>
+//                                 <input
+//                                     id="topic"
+//                                     type="text"
+//                                     className="w-full p-2 text-sm border border-gray-300 rounded-md text-black"
+//                                     placeholder="Ex: India"
+//                                     required
+//                                     value={topic}
+//                                     onChange={(e) => setTopicName(e.target.value)}
+//                                 />
+//                             </div>
+//                             <div>
+//                                 <label htmlFor="noofQuestions" className="block text-sm font-medium mb-1 text-gray-700">
+//                                     <ListOrdered className="inline w-4 h-4 mr-1" />
+//                                     Number of Questions
+//                                 </label>
+//                                 <input
+//                                     id="noofQuestions"
+//                                     type="number"
+//                                     className="w-full p-2 text-sm border border-gray-300 rounded-md text-black"
+//                                     placeholder="Number"
+//                                     max={10}
+//                                     required
+//                                     value={noofQuestions}
+//                                     onChange={(e) => setNoofQuestions(e.target.value)}
+//                                 />
+//                             </div>
+//                             <button
+//                                 type="submit"
+//                                 className="w-full bg-black text-white font-medium py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300 flex items-center justify-center space-x-2"
+//                                 disabled={loading}
+//                             >
+//                                 {loading ? (
+//                                     <span>Generating...</span>
+//                                 ) : (
+//                                     <>
+//                                         <Send className="w-4 h-4" />
+//                                         <span>Generate Quiz</span>
+//                                     </>
+//                                 )}
+//                             </button>
+//                         </form>
+//                     </div>
+//                 )}
+//                 {questions.length > 0 && (
+//                     <div className="space-y-4">
+//                         {quizLink && (
+//     <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex items-center justify-between">
+//         <span className="text-sm font-medium text-black truncate flex-grow mr-4">{title}</span>
+//         <button
+//             onClick={handleCopyToClipboard}
+//             className="flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+//         >
+//             <Clipboard className="w-4 h-4 mr-1" />
+//             Copy Link
+//         </button>
+//     </div>
+// )}
+// {copySuccess && (
+//     <div className={`mt-2 p-2 text-sm rounded-md ${copySuccess === "Copied!" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+//         {copySuccess}
+//     </div>
+// )}
+//                         {questions.map((question, index) => (
+//                             <div key={question._id} className="bg-white border border-gray-200 rounded-lg shadow-sm">
+//                                 <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+//                                     <h3 className="text-md font-semibold text-black">
+//                                         Q {index + 1}
+//                                     </h3>
+//                                     <div className="flex space-x-2">
+//                                         <button
+//                                             onClick={() => handleEdit(question)}
+//                                             className="flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+//                                         >
+//                                             <Edit3 className="w-4 h-4 mr-1" />
+//                                             Edit
+//                                         </button>
+//                                         <button
+//                                             onClick={() => handleDelete(question._id)}
+//                                             className="flex items-center px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300"
+//                                         >
+//                                             <Trash className="w-4 h-4 mr-1" />
+//                                             Delete
+//                                         </button>
+//                                     </div>
+//                                 </div>
+//                                 <div className="p-4">
+//                                     {editingQuestionId === question._id ? (
+//                                         <div className="space-y-3">
+//                                             <input
+//                                                 type="text"
+//                                                 name="questionText"
+//                                                 value={editedQuestion.questionText}
+//                                                 onChange={handleEditChange}
+//                                                 className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black text-black"
+//                                             />
+//                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+//                                                 {editedQuestion.options.map((option, idx) => (
+//                                                     <div key={idx} className="flex items-center">
+//                                                         <input
+//                                                             type="radio"
+//                                                             name="correctAnswerIndex"
+//                                                             value={idx}
+//                                                             checked={idx === editedQuestion.correctAnswerIndex}
+//                                                             onChange={handleEditChange}
+//                                                             className="mr-2"
+//                                                         />
+//                                                         <input
+//                                                             type="text"
+//                                                             name="options"
+//                                                             value={option}
+//                                                             onChange={(e) => handleEditChange(e, idx)}
+//                                                             className="flex-grow p-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black text-black"
+//                                                         />
+//                                                     </div>
+//                                                 ))}
+//                                             </div>
+//                                             <textarea
+//                                                 name="explanation"
+//                                                 value={editedQuestion.explanation}
+//                                                 onChange={handleEditChange}
+//                                                 className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black text-black"
+//                                                 rows="2"
+//                                             />
+//                                             <div className="flex space-x-2">
+//                                                 <button
+//                                                     onClick={() => handleSave(question._id)}
+//                                                     className="flex items-center px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
+//                                                 >
+//                                                     <Save className="w-4 h-4 mr-1" />
+//                                                     Save
+//                                                 </button>
+//                                                 <button
+//                                                     onClick={handleCancel}
+//                                                     className="flex items-center px-3 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-300 transition duration-300"
+//                                                 >
+//                                                     <X className="w-4 h-4 mr-1" />
+//                                                     Cancel
+//                                                 </button>
+//                                             </div>
+//                                         </div>
+//                                     ) : (
+//                                         <div className="space-y-3">
+//                                             <p className="text-sm font-medium text-black">{question.questionText}</p>
+//                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+//                                                 {question.options.map((option, idx) => (
+//                                                     <div
+//                                                         key={idx}
+//                                                         className={`flex items-center p-2 rounded-md transition-all duration-300 cursor-pointer text-sm ${
+//                                                             idx === question.correctAnswerIndex
+//                                                                 ? 'bg-black text-white'
+//                                                                 : 'bg-gray-100 text-black hover:bg-gray-200'
+//                                                         }`}
+//                                                     >
+//                                                         <span className="mr-2">{idx + 1}.</span>
+//                                                         <p>{option}</p>
+//                                                     </div>
+//                                                 ))}
+//                                             </div>
+//                                             <div>
+//                                                 <button
+//                                                     onClick={() => toggleExplanation(question._id)}
+//                                                     className="w-full flex justify-between items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition duration-300 text-black text-sm"
+//                                                 >
+//                                                     <span className="font-medium">Explanation</span>
+//                                                     {expandedQuestionId === question._id ? (
+//                                                         <ChevronUp className="w-4 h-4" />
+//                                                     ) : (
+//                                                         <ChevronDown className="w-4 h-4" />
+//                                                     )}
+//                                                 </button>
+//                                                 {expandedQuestionId === question._id && (
+//                                                     <div className="mt-2 p-2 bg-gray-50 rounded-md">
+//                                                         <p className="text-gray-700 text-sm">{question.explanation}</p>
+//                                                     </div>
+//                                                 )}
+//                                             </div>
+//                                         </div>
+//                                     )}
+//                                 </div>
+//                             </div>
+//                         ))}
+//                         <div className="mt-4">
+//                             <button
+//                                 onClick={handleAddQuestion}
+//                                 className="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300"
+//                             >
+//                                 <PlusCircle className="w-4 h-4 mr-2" />
+//                                 Add New Question
+//                             </button>
+//                         </div>
+//                     </div>
+//                 )}
+//             </div>
+//         </div>
+//     );
+// }
+
+// export default Create;
 
 /*
 

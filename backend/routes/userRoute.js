@@ -8,9 +8,69 @@ import zod from 'zod';
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from "google-auth-library";
 import authMiddleware from "../middlewares/authMiddleware.js";
+import multer from "multer";
+import path from 'path';
+import fs from 'fs';
+import multerS3 from 'multer-s3';
+// import AWS from 'aws-sdk';
+import { S3Client } from "@aws-sdk/client-s3";
+import CreditsModel from "../models/Credits.js";
+import dotenv from 'dotenv';
+dotenv.config();
+
+
+
 const client=new OAuth2Client();
 
 const UserRouter = express.Router();
+
+// const s3 = new AWS.S3({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: process.env.AWS_REGION,
+// });
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+console.log("S3 client:", s3); 
+
+
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'quizai',
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString());
+    },
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+  })
+});
+
+
+// Ensure 'uploads' directory exists
+// if (!fs.existsSync('uploads')) {
+//   fs.mkdirSync('uploads');
+// }
+
+// // Set up multer for file uploads
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//       cb(null, 'uploads/');
+//   },
+//   filename: function (req, file, cb) {
+//       cb(null, Date.now() + path.extname(file.originalname));
+//   }
+// });
+
+// const upload = multer({ storage: storage });
 
 const signupSchema = zod.object({
   userName: zod.string().email(),
@@ -102,12 +162,20 @@ UserRouter.post("/google-signin",async(req,res)=>{
     const firstName=payload['given_name'];
     const lastName=payload['family_name'];
     let user=await Users.findOne({userName:userName});
+    let userExists=true;
     if(!user){
+      userExists=false;
       user=await Users.create({
         userName,
         firstName,
         lastName,
         googleId:googleId
+      });
+    }
+    if(!userExists)
+    {
+      await CreditsModel.create({
+        userId:user._id
       });
     }
     const jwtToken=jwt.sign({
@@ -227,6 +295,22 @@ UserRouter.get("/me",authMiddleware,async(req,res)=>{
      } 
 })
 
+UserRouter.get("/credit",authMiddleware,async(req,res)=>{
+   try {
+       const response=await CreditsModel.findOne({userId:req.userId});
+       console.log("the response is:",response);
+       if(!response)
+       return res.status(404).json({
+        message:'credits not found'
+       })
+       return res.status(200).json({
+         credits:response.credits
+       });
+   } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+   }
+});
 // updating details of user
 UserRouter.patch("/me",authMiddleware,async(req,res)=>{
        const userId=req.userId;
@@ -244,6 +328,39 @@ UserRouter.patch("/me",authMiddleware,async(req,res)=>{
        return res.status(401).json({message:'Error occured'});
        }
 });
+
+
+
+// UserRouter.post('/upload-image', authMiddleware, upload.single('image'), async (req, res) => {
+//   try {
+//       if (req.file) {
+//           console.log("File uploaded:", req.file);
+//           res.send('File uploaded successfully.');
+//       } else {
+//           res.status(400).send('Failed to upload file.');
+//       }
+//   } catch (error) {
+//       console.error('Error during file upload:', error);
+//       res.status(500).send('Internal Server Error');
+//   }
+// });
+UserRouter.post('/upload-image', authMiddleware, upload.single('file'), async (req, res) => {
+  try {
+    console.log('Request received:', req.file);
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    console.log('File uploaded:', req.file.location);
+    res.status(200).json({
+      message: 'File uploaded successfully',
+      url: req.file.location,
+    });
+  } catch (error) {
+    console.error('Error during file upload:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 
 export default UserRouter;

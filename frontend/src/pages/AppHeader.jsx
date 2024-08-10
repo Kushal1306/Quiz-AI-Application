@@ -1,11 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut,Coins } from 'lucide-react';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 function AppHeader() {
     const navigate = useNavigate();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [credits,setCredits]=useState(null);
+
+    useEffect(()=>{
+        const token=localStorage.getItem("token");
+        const fetchCredits=async()=>{
+            try {
+                const response=await axios.get("https://quiz-ai-backend.vercel.app/user/credit",{
+                    headers:{
+                        'Authorization':`Bearer ${token}`
+                    }
+                })
+                console.log(response.data);
+                setCredits(response.data.credits);            
+            } catch (error) {
+                console.log("error");
+            }    
+        };
+        fetchCredits();
+    },[]);
 
     const handleNavigation = (path) => {
         navigate(path);
@@ -28,12 +49,17 @@ function AppHeader() {
                     <div className="flex items-center space-x-4">
                         <span className="text-white text-xl font-bold">QuizAI</span>
                         <nav className="hidden md:flex space-x-1">
-                            <button onClick={() => handleNavigation("/MyQuizzes")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">My Quizzes</button>
-                            <button onClick={() => handleNavigation("/take-a-quiz")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Take a Quiz</button>
-                            <button onClick={() => handleNavigation("/take-a-quiz")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Practice Quiz</button>
+                            <button onClick={() => handleNavigation("/dashboard")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">My Quizzes</button>
+                            <button onClick={() => handleNavigation("/create")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Create a Quiz</button>
+                            <button onClick={() => handleNavigation("/take-a-quiz")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Test Your Knowledge</button>
                         </nav>
                     </div>
                     <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2 text-white hover:text-gray-300 transition duration-300">
+                            <h1>Credits Left</h1>
+                            <Coins size={18} color='gold' />
+                            <span>{credits}</span>
+                        </div>
                         <div className="relative">
                             <button
                                 onClick={handleProfileClick}
@@ -67,9 +93,9 @@ function AppHeader() {
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-gray-900">
                     <nav className="flex flex-col p-2 space-y-1">
-                        <button onClick={() => handleNavigation("/MyQuizzes")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">My Quizzes</button>
-                        <button onClick={() => handleNavigation("/take-a-quiz")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Take a Quiz</button>
-                        <button onClick={() => handleNavigation("/take-a-quiz")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Practice Quiz</button>
+                        <button onClick={() => handleNavigation("/dashboard")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">My Quizzes</button>
+                        <button onClick={() => handleNavigation("/create")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Create a Quiz </button>
+                        <button onClick={() => handleNavigation("/take-a-quiz")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Test Your Knowledge</button>
                     </nav>
                 </div>
             )}
