@@ -32,8 +32,8 @@ const Pricing = () => {
     }
   ];
   const handleButton=()=>{
-    console.log("hii");
-      navigate('/login');
+    // console.log("hii");
+      navigate('/signup');
   };
 
   return (
