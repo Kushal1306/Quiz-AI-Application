@@ -89,6 +89,7 @@ UserRouter.post("/signup", async (req, res) => {
     const existingUser = await Users.findOne({ userName: userName });
     if (existingUser)
       return res.status(400).json({ message: 'User already exists' });
+    let userExists=false;
     const newUser = new Users({
       userName,
       password,
@@ -96,6 +97,12 @@ UserRouter.post("/signup", async (req, res) => {
       lastName
     });
     const response = await newUser.save();
+    if(!userExists)
+      {
+        await CreditsModel.create({
+          userId:user._id
+        });
+      }
     console.log(response);
     if (response) {
       const token = jwt.sign({
@@ -149,7 +156,7 @@ UserRouter.post("/signin", async (req, res) => {
 });
 
 UserRouter.post("/google-signin",async(req,res)=>{
-  const token=req.body.token;
+  const token=req.body.token;a
   console.log(token);
   try {
     const ticket=await client.verifyIdToken({
