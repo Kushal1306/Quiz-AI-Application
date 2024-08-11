@@ -6,7 +6,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import Leaderboard from './Leaderboard';
-import { Clipboard } from 'lucide-react';
+import { Clipboard, Grid, List } from 'lucide-react';
+import QuizTable from '../components/QuizTable';
 
 function MyQuizzes() {
     const [searchText, setSearchText] = useState("");
@@ -16,6 +17,8 @@ function MyQuizzes() {
     const [selectedQuizId, setSelectedQuizId] = useState(null);
     const [showMyQuizzes, setShowMyQuizzes] = useState(true);
     const [myLink,setMyLink]=useState("");
+    const [viewMode, setViewMode] = useState('grid'); // New state for view mode
+
 
     const handleCreateQuiz = () => {
         navigate("/create");
@@ -44,6 +47,10 @@ function MyQuizzes() {
 
     };
 
+    const handleViewModeChange = (mode) => {
+        setViewMode(mode);
+    };
+
     useEffect(() => {
         const fetchQuizzes = async () => {
             const token = localStorage.getItem("token");
@@ -68,7 +75,6 @@ function MyQuizzes() {
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
-            {/* <AppHeader /> */}
             <main className="flex-grow pt-4 sm:pt-6">
                 <div className="container mx-auto px-4 py-2">
                     {showLeaderboard && (
@@ -92,45 +98,69 @@ function MyQuizzes() {
                                     value={searchText}
                                 />
                             </div>
-                            <button 
-                                onClick={handleCreateQuiz}
-                                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-2 transition duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            >
-                                Create Quiz
-                            </button>
+                            <div className="flex items-center space-x-4">
+                                <button 
+                                    onClick={handleCreateQuiz}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-2 transition duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                >
+                                    Create Quiz
+                                </button>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => handleViewModeChange('grid')}
+                                        className={`p-2 rounded-full ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                                    >
+                                        <Grid size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleViewModeChange('table')}
+                                        className={`p-2 rounded-full ${viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                                    >
+                                        <List size={20} />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
                     {showMyQuizzes && quizzes.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {quizzes.map((quiz, index) => (
-                                <div key={quiz._id} className="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl">
-                                    <div className="p-6 flex-grow">
-                                        <h3 className="text-xl font-bold mb-2 text-gray-800">{quiz.title}</h3>
-                                        <p className="text-gray-600">{quiz.description}</p>
+                        viewMode === 'grid' ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {quizzes.map((quiz) => (
+                                    <div key={quiz._id} className="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl">
+                                        <div className="p-6 flex-grow">
+                                            <h3 className="text-xl font-bold mb-2 text-gray-800">{quiz.title}</h3>
+                                            <p className="text-gray-600">{quiz.description}</p>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 flex items-center justify-between">
+                                            <button
+                                                onClick={() => {
+                                                    setMyLink(`https://www.quizai.tech/play?quizId=${quiz._id}`);
+                                                    handleCopyToClipboard();
+                                                }}
+                                                className="flex items-center px-3 py-1 md:px-5 md:py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300"
+                                            >
+                                                <Clipboard className="w-4 h-4 mr-1" />
+                                                Copy Link
+                                            </button>
+                                            <button 
+                                                className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full text-sm px-3 py-1 md:px-5 md:py-2 transition duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                                                onClick={() => handleViewLeaderboard(quiz._id)}
+                                            >
+                                                <LeaderboardIcon className="text-2xl text-white px-1 h-4" />
+                                                View Leaderboard
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="bg-gray-50 p-4 flex items-center justify-between">
-                                    <button
-                                  onClick={()=>{
-                                    setMyLink(`https://www.quizai.tech/play?quizId=${quiz._id}`)
-                                    handleCopyToClipboard()
-                                  }}
-                                  className="flex items-center px-3 py-1 md:px-5 md:py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300"
-                                   >
-                                  <Clipboard className="w-4 h-4 mr-1" />
-                                  Copy Link
-                                   </button>
-                                        
-                                        <button 
-                                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full text-sm px-3 py-1 md:px-5 md:py-2 transition duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-                                            onClick={() => handleViewLeaderboard(quiz._id)}
-                                        >
-                                            <LeaderboardIcon className="text-2xl text-white px-1 h-4" />
-                                            View Leaderboard
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <QuizTable 
+                                quizzes={quizzes} 
+                                handleViewLeaderboard={handleViewLeaderboard}
+                                handleCopyToClipboard={handleCopyToClipboard}
+                                setMyLink={setMyLink}
+                            />
+                        )
                     )}
                     {showLeaderboard && selectedQuizId && (
                         <div className='justify-center items-center'>
@@ -141,7 +171,7 @@ function MyQuizzes() {
             </main>
         </div>
     );
-}
+};
 export default MyQuizzes;
 
 

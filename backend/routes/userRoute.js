@@ -90,23 +90,22 @@ UserRouter.post("/signup", async (req, res) => {
     if (existingUser)
       return res.status(400).json({ message: 'User already exists' });
     let userExists=false;
-    const newUser = new Users({
+    const newUser=await Users.create({
       userName,
       password,
       firstName,
       lastName
     });
-    const response = await newUser.save();
     if(!userExists)
       {
         await CreditsModel.create({
-          userId:user._id
+          userId:newUser._id
         });
       }
-    console.log(response);
-    if (response) {
+    console.log(newUser);
+    if (newUser) {
       const token = jwt.sign({
-        userId: response._id
+        userId: newUser._id
 
       }, process.env.JWT_SECRET);
       return res.status(201).json({

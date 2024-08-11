@@ -145,11 +145,17 @@ questionRouter.post("/generate", authMiddleware, async (req, res) => {
 });
 
 questionRouter.post("/generate2",authMiddleware,creditsMiddleware,async(req,res)=>{
-    const {title,topic,noofQuestions}=req.body;
+    const {title,topic,questionType,noofQuestions}=req.body;
+    let questionInfo='Multiple Choice Questions';
+    if(questionType==='TF')
+        questionInfo='Truth and False Questions'
+    else if(questionType==='Mixed')
+        questionInfo='Both MCQS and Truth and False Questions'
 
     const structuredLlm = model.withStructuredOutput(multipleQuestionsSchema);
     try {
         // const {quizId,topic,noofQuestions}=req.body;
+        console.log("question type:",questionInfo);
         console.log("no of questions",noofQuestions);
         console.log("Topic:", topic);
         const userId = req.userId;
@@ -159,7 +165,7 @@ questionRouter.post("/generate2",authMiddleware,creditsMiddleware,async(req,res)
             userId:userId
         });
 
-        const prompt = `You are a helpful AI assistant tasked with creating multiple-choice questions. Please generate ${noofQuestions} MCQ questions about ${topic}  `;    
+        const prompt = `You are a helpful AI assistant tasked with creating ${questionInfo}. Please generate ${noofQuestions} about ${topic}  `;    
         console.log("Prompt:", prompt);
         const modelResponse=await structuredLlm.invoke(prompt);
         const [newQuiz,response]=await Promise.all([newQuizCreation,modelResponse]);
