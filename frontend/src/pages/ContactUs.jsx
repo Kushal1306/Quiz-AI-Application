@@ -3,7 +3,7 @@ import { Mail, MessageSquare, Send, Check } from 'lucide-react';
 import InputBox2 from '../components/InputBox2';
 import axios from 'axios';
 
-const ContactUsa = () => {
+const ContactUs = () => {
   const [sender, setSender] = useState('');
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
