@@ -15,6 +15,7 @@ import multerS3 from 'multer-s3';
 // import AWS from 'aws-sdk';
 import { S3Client } from "@aws-sdk/client-s3";
 import CreditsModel from "../models/Credits.js";
+import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -71,6 +72,14 @@ const upload = multer({
 // });
 
 // const upload = multer({ storage: storage });
+
+let transporter=nodemailer.createTransport({
+  service:'gmail',
+  auth:{
+    user:process.env.EMAIL_USERNAME,
+    pass:process.env.EMAIL_PASSWORD
+  }
+})
 
 const signupSchema = zod.object({
   userName: zod.string().email(),
@@ -146,7 +155,7 @@ UserRouter.post("/signin", async (req, res) => {
       token: token,
       message: 'user SignedIn Successfully'
     });
-
+s
   } catch (error) {
     console.error(error);
     return res.status(401).json({ message: 'request failed' });
@@ -335,7 +344,29 @@ UserRouter.patch("/me",authMiddleware,async(req,res)=>{
        }
 });
 
-
+UserRouter.post("/sendMail",async(req,res)=>{
+      const {sender,subject,content}=req.body;
+      const mailOptions={
+         from:`QuizAI Query ${sender}`,
+         to:'kalakushal.jain@gmail.com',
+         subject:subject,
+         text:`${content}\n The above query is raised by ${sender}`,
+         replyTo:sender
+      };
+        try {
+          const info=await transporter.sendMail(mailOptions);
+          if(!info)
+            return res.status(400).json({
+          message:'Unsuccessfull attempt'
+          })
+          console.log("message send:",info.messageId);
+          res.status(200).json({ message: 'Your message has been sent successfully!' });
+          
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'An error occurred while sending your message.' });
+        }
+});
 
 // UserRouter.post('/upload-image', authMiddleware, upload.single('image'), async (req, res) => {
 //   try {

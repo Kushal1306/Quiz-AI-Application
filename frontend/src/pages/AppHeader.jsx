@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut,Coins } from 'lucide-react';
+import { Menu, X, User, LogOut,Coins,Contact } from 'lucide-react';
 import { useEffect } from 'react';
 import axios from 'axios';
-
+import ContactUs from './ContactUs';
 function AppHeader() {
     const navigate = useNavigate();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -77,6 +77,10 @@ function AppHeader() {
                                     <ProfileOption onClick={handleLogout}>
                                         <LogOut size={16} />
                                         <span>Logout</span>
+                                    </ProfileOption>
+                                    <ProfileOption onClick={()=>navigate("/contact")}>
+                                        <Contact size={16} />
+                                        <span>Contact Us</span>
                                     </ProfileOption>
                                 </div>
                             )}
