@@ -29,6 +29,7 @@ const singleQuestionSchema = z.object({
 
 // Define the schema for multiple questions
 const multipleQuestionsSchema = z.object({
+  title:z.string().describe('title of the quiz'),
   questions: z.array(singleQuestionSchema),
 });
 
@@ -145,7 +146,8 @@ questionRouter.post("/generate", authMiddleware, async (req, res) => {
 });
 
 questionRouter.post("/generate2",authMiddleware,creditsMiddleware,async(req,res)=>{
-    const {title,topic,questionType,noofQuestions}=req.body;
+    console.log(req.body);
+    const {title,content,questionType,noofQuestions,language,difficulty}=req.body;
     let questionInfo='Multiple Choice Questions';
     if(questionType==='TF')
         questionInfo='Truth and False Questions'
@@ -157,19 +159,30 @@ questionRouter.post("/generate2",authMiddleware,creditsMiddleware,async(req,res)
         // const {quizId,topic,noofQuestions}=req.body;
         console.log("question type:",questionInfo);
         console.log("no of questions",noofQuestions);
-        console.log("Topic:", topic);
+        console.log("Topic:", title);
         const userId = req.userId;
-        const newQuizCreation = Quizzes.create({
-            title:title,
-            description:topic,
+        // const newQuizCreation = Quizzes.create({
+        //     title:title,
+        //     description:topic,
+        //     userId:userId
+        // });
+
+        // const prompt = `You are a helpful AI assistant tasked with creating ${questionInfo} in language ${language} with diffculty ${difficulty} Please generate ${noofQuestions} about the topic or content mentioned ${topic}  `;    
+         const prompt = `You are a helpful AI assistant responsible for generating ${noofQuestions} questions. The questions should be ${questionInfo}. The questions and output should be in ${language}, tailored to a ${difficulty} difficulty level. Please ensure the output is in ${language}, donot repeat any questions and focused on this content: ${title} ${content}.`;
+
+        console.log("Prompt:", prompt);
+        // const modelResponse=await structuredLlm.invoke(prompt);
+        // const [newQuiz,response]=await Promise.all([newQuizCreation,modelResponse]);
+        const response=await structuredLlm.invoke(prompt);
+        console.log("the response is:",response);
+        const newQuiz = await Quizzes.create({
+            title:response.title,
+            description:questionInfo,
             userId:userId
         });
-
-        const prompt = `You are a helpful AI assistant tasked with creating ${questionInfo}. Please generate ${noofQuestions} about ${topic}  `;    
-        console.log("Prompt:", prompt);
-        const modelResponse=await structuredLlm.invoke(prompt);
-        const [newQuiz,response]=await Promise.all([newQuizCreation,modelResponse]);
         const quizId=newQuiz._id;
+    
+        
         const myData=response.questions;
         const questionsToInsert=myData.map((question,index)=>({
             quizId:quizId,

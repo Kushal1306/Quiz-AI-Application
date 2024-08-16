@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import Leaderboard from './Leaderboard';
 import { Clipboard, Grid, List } from 'lucide-react';
 import QuizTable from '../components/QuizTable';
+import toast from 'react-hot-toast';
+
 
 function MyQuizzes() {
     const [searchText, setSearchText] = useState("");
@@ -40,7 +42,7 @@ function MyQuizzes() {
     const handleCopyToClipboard=async()=>{
         try {
             await navigator.clipboard.writeText(myLink);
-            
+            toast.success('Link copied to clipboard!');
         } catch (error) {
             console.log(error);
         }
@@ -131,7 +133,7 @@ function MyQuizzes() {
                                             <h3 className="text-xl font-bold mb-2 text-gray-800">{quiz.title}</h3>
                                             <p className="text-gray-600">{quiz.description}</p>
                                         </div>
-                                        <div className="bg-gray-50 p-4 flex items-center justify-between">
+                                        <div className="bg-gray-50 p-4 flex items-center justify-between gap-1">
                                             <button
                                                 onClick={() => {
                                                     setMyLink(`https://www.quizai.tech/play?quizId=${quiz._id}`);

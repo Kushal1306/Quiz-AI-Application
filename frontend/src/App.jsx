@@ -13,6 +13,8 @@ import ImageQuiz from './pages/ImageQuiz';
 import Thankingpage from './pages/Thankingpage';
 import AppHeader from './pages/AppHeader';
 import ContactUs from './pages/ContactUs';
+import { Toaster } from 'react-hot-toast';
+
 
 function HeaderWrapper() {
   const location = useLocation();
@@ -51,6 +53,7 @@ function App() {
         <div className="min-h-screen flex flex-col">
           <HeaderWrapper />
           <MainContent />
+          <Toaster/>
         </div>
       </Router>
     </GoogleOAuthProvider>

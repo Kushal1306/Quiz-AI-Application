@@ -1,39 +1,53 @@
-import React from "react";
-import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, Clipboard, Download,CircleHelp } from 'lucide-react';
+import React from 'react';
 
 const InputBox2 = ({
-    id,
-    type,
-    label,
-    value,
-    onChange,
-    placeholder,
-    required=false,
-    min,
-    max,
-    icon:Icon,
-    className='',
+  id,
+  type,
+  label,
+  value,
+  onChange,
+  placeholder,
+  required = false,
+  icon:Icon,
+  min,
+  max,
+  className = '',
+  rows = 5, // Default rows for textarea
+  cols = 50, // Default cols for textarea
 }) => {
-
   return (
     <div className={`space-y-1 ${className}`}>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-      {Icon && <Icon className="inline w-4 h-4 mr-1" />}
-      {label}
-    </label>
-    <input
-      id={id}
-      type={type}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      required={required}
-      min={min}
-      max={max}
-      className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
+      <label htmlFor={id} className="flex items-center text-sm font-medium text-gray-700">
+       {Icon && <Icon className="inline w-4 h-4 mr-1" />}
+
+        {label}
+      </label>
+      {type === 'textarea' ? (
+        <textarea
+          id={id}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          required={required}
+          rows={rows}
+          cols={cols}
+          className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      ) : (
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          required={required}
+          min={min}
+          max={max}
+          className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      )}
+    </div>
   );
 };
 
-export default InputBox2
+export default InputBox2;

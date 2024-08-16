@@ -30,30 +30,30 @@ const UserRouter = express.Router();
 //   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 //   region: process.env.AWS_REGION,
 // });
-const s3 = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+// const s3 = new S3Client({
+//   region: process.env.AWS_REGION,
+//   credentials: {
+//     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   },
+// });
 
-console.log("S3 client:", s3); 
+// console.log("S3 client:", s3); 
 
 
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: 'quizai',
-    metadata: function (req, file, cb) {
-      cb(null, { fieldName: file.fieldname });
-    },
-    key: function (req, file, cb) {
-      cb(null, Date.now().toString());
-    },
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-  })
-});
+// const upload = multer({
+//   storage: multerS3({
+//     s3: s3,
+//     bucket: 'quizai',
+//     metadata: function (req, file, cb) {
+//       cb(null, { fieldName: file.fieldname });
+//     },
+//     key: function (req, file, cb) {
+//       cb(null, Date.now().toString());
+//     },
+//     contentType: multerS3.AUTO_CONTENT_TYPE,
+//   })
+// });
 
 
 // Ensure 'uploads' directory exists
@@ -155,7 +155,7 @@ UserRouter.post("/signin", async (req, res) => {
       token: token,
       message: 'user SignedIn Successfully'
     });
-s
+
   } catch (error) {
     console.error(error);
     return res.status(401).json({ message: 'request failed' });
@@ -381,22 +381,22 @@ UserRouter.post("/sendMail",async(req,res)=>{
 //       res.status(500).send('Internal Server Error');
 //   }
 // });
-UserRouter.post('/upload-image', authMiddleware, upload.single('file'), async (req, res) => {
-  try {
-    console.log('Request received:', req.file);
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-    console.log('File uploaded:', req.file.location);
-    res.status(200).json({
-      message: 'File uploaded successfully',
-      url: req.file.location,
-    });
-  } catch (error) {
-    console.error('Error during file upload:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
+// UserRouter.post('/upload-image', authMiddleware, upload.single('file'), async (req, res) => {
+//   try {
+//     console.log('Request received:', req.file);
+//     if (!req.file) {
+//       return res.status(400).json({ error: 'No file uploaded' });
+//     }
+//     console.log('File uploaded:', req.file.location);
+//     res.status(200).json({
+//       message: 'File uploaded successfully',
+//       url: req.file.location,
+//     });
+//   } catch (error) {
+//     console.error('Error during file upload:', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// });
 
 
 

@@ -1,13 +1,18 @@
-import React, { useState } from "react";
-import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, Clipboard, Download,CircleHelp } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { Edit3, Save, X, ChevronDown, ChevronUp, BookOpen, ListOrdered, Send, Captions, Trash, Clipboard, Download,CircleHelp,Languages,Star } from 'lucide-react';
 import axios from 'axios';
 import Select from "../components/Select";
 import InputBox2 from "../components/InputBox2";
 import DownloadButton from "../components/DownloadOption";
+import { Button } from "../components/Button";
+import pdfToText from 'react-pdftotext';
+
+
+
 const Create = () => {
   const [title, setTitle] = useState("");
   const [topic, setTopic] = useState("");
-  const [noofQuestions, setNoofQuestions] = useState(5);
+  const [noofQuestions, setNoofQuestions] = useState(3);
   const [loading, setLoading] = useState(false);
   const [quizId, setQuizId] = useState("");
   const [questions, setQuestions] = useState([]);
@@ -16,24 +21,48 @@ const Create = () => {
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
   const [quizLink, setQuizLink] = useState("");
   const [copySuccess, setCopySuccess] = useState("");
-  const [questionType,setquestionType]=useState('');
+  const [questionType,setQuestionType]=useState('MCQ');
+  const [language,setLanguage]=useState('ENGLISH');
+  const [activeTab,setActiveTab]=useState('topic');
+  const [content,setContent]=useState('');
+  const [file,setFile]=useState(null);
+  const [difficulty,setdifficulty]=useState('MEDIUM');
 
   const options=[
     {value:'MCQ',label:'MCQ'},
     {value:'TF',label:'True and False' },
     {value:'Mixed',label:'Mixed'}
   ]
+  const languageOptions=[
+    {value:'English',label:'English'},
+    {value:'Hindi',label:'Hindi'},
+    {value:'Telugu',label:'Telugu'},
+    {value:'Tamil',label:'Tamil'},
+    {value:'Spanish',label:'Spanish'},
+    {value:'French',label:'French'}
+  ]
+
+  const questiondifficulty=[
+    {value:'easy',label:'Easy'},
+    {value:'medium',label:'Medium'},
+    {value:'hard',label:'Hard'}
+  ]
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     const token = localStorage.getItem("token");
+
+    console.log("Debug - State variables:", { title, content, file, questionType, noofQuestions, language, difficulty });
+
     try {
-      const response = await axios.post("https://quiz-ai-backend.vercel.app/question/generate2", {
-        title,
-        topic,
-        questionType,
-        noofQuestions
+      const response = await axios.post("http://localhost:3000/question/generate2",{
+       title, 
+       content,
+       questionType,
+       noofQuestions,
+       language, 
+       difficulty 
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -51,7 +80,15 @@ const Create = () => {
       setLoading(false);
     }
   };
+  useEffect(()=>{
+     if(activeTab==='topic'||activeTab==='content')
+     {
+      setContent('');
+      setFile(null); 
+     }
+     
 
+  },[activeTab]);
   const handleEdit = (question) => {
     setEditingQuestionId(question._id);
     setEditedQuestion({ ...question });
@@ -122,16 +159,6 @@ const Create = () => {
     }
   };
 
-  // const handleDownload = () => {
-  //   const dataStr = JSON.stringify(questions, null, 2);
-  //   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-  //   const exportFileDefaultName = `${title || 'quiz'}_questions.json`;
-
-  //   const linkElement = document.createElement('a');
-  //   linkElement.setAttribute('href', dataUri);
-  //   linkElement.setAttribute('download', exportFileDefaultName);
-  //   linkElement.click();
-  // };
   const handleDownload = (format = 'json') => {
     // Filter the questions to include only the desired fields
     const filteredQuestions = questions.map(q => ({
@@ -172,81 +199,144 @@ const Create = () => {
 
   
   const handleChange=(value)=>{
-    setquestionType(value);
+    setQuestionType(value);
     console.log('the value:',value);
   }
+  
+ 
+
+  function extractText(event) {
+    const file = event.target.files[0]
+    setFile(file);
+    pdfToText(file)
+        .then((text) => {
+          setContent(text);
+          console.log(text);
+  }).catch(error => console.error("Failed to extract text from pdf"))
+}
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 text-gray-800">
       <div className="container mx-auto p-4 lg:p-8 flex flex-col lg:flex-row lg:space-x-8">
         {/* Quiz Creation Form - Fixed on larger screens */}
-        <div className="w-full lg:w-2/5 mb-8 lg:mb-0 lg:sticky lg:top-8 lg:self-start">
-          <div className="bg-white shadow-lg rounded-lg p-6">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-6 text-center text-gray-800">Create Your Quiz</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <InputBox2
-                id="title"
-                type="text"
-                label="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter Title ex: A Quiz on India"
-                required
-                icon={Captions}
-              />
-              <InputBox2
-                id="topic"
-                type="text"
-                label="Topic Name"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="Ex: India"
-                required
-                icon={BookOpen}
-              />
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="w-full sm:w-1/2">
-                  <Select
-                    options={options}
-                    label="Question Type"
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="w-full sm:w-1/2">
-                  <InputBox2
-                    id="noofQuestions"
-                    type="number"
-                    label="Number of Questions"
-                    value={noofQuestions}
-                    onChange={(e) => setNoofQuestions(e.target.value)}
-                    placeholder="Number"
-                    required
-                    min={1}
-                    max={10}
-                    icon={ListOrdered}
-                  />
-                </div>
-              </div>
-              
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md hover:bg-blue-700 transition duration-300 flex items-center justify-center space-x-2"
-                disabled={loading}
-              >
-                {loading ? (
-                  <span>Generating...</span>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Generate Quiz</span>
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
+        <div className="w-full max-w-md mx-auto">
+      <div className="bg-white shadow-lg rounded-lg p-6">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Create Your Quiz</h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex gap-1 mb-6">
+            {['topic', 'content', 'file'].map((tab) => (
+              <Button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                label={tab.charAt(0).toUpperCase() + tab.slice(1)}
+                className={`flex-1 py-2 rounded-lg ${
 
+                  activeTab === tab
+                    ? 'bg-gray-200 text-black'
+                    : 'bg-white text-gray-700 border border-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+
+          {activeTab === 'topic' && (
+            <InputBox2
+              id="topic"
+              type="text"
+              label="Topic Name"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: India"
+              required
+              icon={BookOpen}
+            />
+          )}
+
+          {activeTab === 'content' && (
+            <InputBox2
+              id="content"
+              type="textarea"
+              label="Content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Enter additional content or instructions here"
+              icon={Edit3}
+            />
+          )}
+
+          {activeTab === 'file' && (
+            <InputBox2
+              id="file"
+              type="file"
+              label="Upload File"
+              onChange={extractText}
+              icon={Clipboard}
+            />
+          )}
+          { (activeTab==='file' && file)?( <InputBox2
+              id="content"
+              type="textarea"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              icon={Edit3}
+            />):(<></>)
+            }
+            
+
+          <div className="grid grid-cols-2 gap-4">
+            <Select
+              options={options}
+              label="Question Type"
+              value={questionType}
+              icon={CircleHelp}
+              id="questionType"
+              onChange={(e) => setQuestionType(e.target.value)}
+              required
+            />
+
+            <InputBox2
+              id="noofQuestions"
+              type="number"
+              label="Number of Questions"
+              value={noofQuestions}
+              onChange={(e) => setNoofQuestions(e.target.value)}
+              placeholder="Number"
+              required
+              min={1}
+              max={10}
+              icon={ListOrdered}
+            />
+            <Select
+              options={languageOptions}
+              label="Language"
+              value={language}
+              icon={Languages}
+              onChange={(e) => setLanguage(e.target.value)}
+              id="language"
+              required
+            />
+             <Select
+              options={questiondifficulty}
+              label="Difficulty"
+              value={difficulty}
+              icon={Star}
+              onChange={(e) => setdifficulty(e.target.value)}
+              id="difficulty"
+              required
+            />
+          </div>
+          
+          <Button
+            type="submit"
+            label={loading ? "Generating..." : "Generate Quiz"}
+            className="w-full py-1.5 bg-black text-white  rounded-lg"
+            disabled={loading}
+            icon={Send}
+          />
+        </form>
+      </div>
+    </div>
         {/* Generated Questions - Scrollable on larger screens */}
         <div className="w-full lg:w-3/5">
           <div className="bg-white shadow-lg rounded-lg p-6">
