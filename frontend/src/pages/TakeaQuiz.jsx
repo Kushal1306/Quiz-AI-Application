@@ -98,7 +98,7 @@ function TakeaQuiz() {
     console.log("Debug - State variables:", { title, content, file, questionType, noofQuestions, language, difficulty });
 
     try {
-      const response = await axios.post("http://localhost:3000/question/generate2",{
+      const response = await axios.post("https://quiz-ai-backend.vercel.app/question/generate2",{
        title, 
        content,
        questionType,
