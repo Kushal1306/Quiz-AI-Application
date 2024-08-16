@@ -69,6 +69,7 @@ function TakeaQuiz() {
   const [content,setContent]=useState('');
   const [file,setFile]=useState(null);
   const [difficulty,setdifficulty]=useState('MEDIUM');
+  const maxChars=12000;
 
   const options=[
     {value:'MCQ',label:'MCQ'},
@@ -135,6 +136,11 @@ function TakeaQuiz() {
 
   function extractText(event) {
     const file = event.target.files[0]
+    if (file.type !== "application/pdf") {
+      toast.error("Only PDF files are allowed.");
+      setFile(null);
+      return;
+    }
     setFile(file);
     pdfToText(file)
         .then((text) => {
@@ -251,36 +257,45 @@ function TakeaQuiz() {
               />
             )}
   
-            {activeTab === 'content' && (
-              <InputBox2
-                id="content"
-                type="textarea"
-                label="Content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Enter additional content or instructions here"
-                icon={Edit3}
-              />
-            )}
+  {activeTab === 'content' && (
+           <div>
+             <InputBox2
+              id="content"
+              type="textarea"
+              label="Content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Enter additional content or instructions here"
+              icon={Edit3}
+            />
+            {content.length}/{maxChars} characters used
+           </div>
+
+          )}
   
-            {activeTab === 'file' && (
-              <InputBox2
-                id="file"
-                type="file"
-                label="Upload File"
-                onChange={extractText}
-                icon={Clipboard}
-              />
-            )}
-            { (activeTab==='file' && file)?( <InputBox2
-                id="content"
-                type="textarea"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                icon={Edit3}
-              />):(<></>)
-              }
-              
+  {activeTab === 'file' && (
+            <InputBox2
+              id="file"
+              type="file"
+              label="Upload File"
+              onChange={extractText}
+              icon={Clipboard}
+              accept=".pdf"
+            />
+          )}
+          { (activeTab==='file' && file)?( 
+            <div>
+            <InputBox2
+              id="content"
+              type="textarea"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              icon={Edit3}
+            />
+            </div>
+            ):(<></>)
+            }
+
   
             <div className="grid grid-cols-2 gap-4">
               <Select

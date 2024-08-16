@@ -12,8 +12,10 @@ const InputBox2 = ({
   min,
   max,
   className = '',
+  accept,
   rows = 5, // Default rows for textarea
   cols = 50, // Default cols for textarea
+  maxLength=14000
 }) => {
   return (
     <div className={`space-y-1 ${className}`}>
@@ -31,6 +33,7 @@ const InputBox2 = ({
           required={required}
           rows={rows}
           cols={cols}
+          maxLength={maxLength}
           className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       ) : (
@@ -43,6 +46,7 @@ const InputBox2 = ({
           required={required}
           min={min}
           max={max}
+          accept={accept}
           className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       )}

@@ -6,6 +6,7 @@ import InputBox2 from "../components/InputBox2";
 import DownloadButton from "../components/DownloadOption";
 import { Button } from "../components/Button";
 import pdfToText from 'react-pdftotext';
+import toast from "react-hot-toast";
 
 
 
@@ -27,6 +28,7 @@ const Create = () => {
   const [content,setContent]=useState('');
   const [file,setFile]=useState(null);
   const [difficulty,setdifficulty]=useState('MEDIUM');
+  const maxChars=12000;
 
   const options=[
     {value:'MCQ',label:'MCQ'},
@@ -88,6 +90,7 @@ const Create = () => {
      }
      
   },[activeTab]);
+
   const handleEdit = (question) => {
     setEditingQuestionId(question._id);
     setEditedQuestion({ ...question });
@@ -206,6 +209,11 @@ const Create = () => {
 
   function extractText(event) {
     const file = event.target.files[0]
+    if (file.type !== "application/pdf") {
+      toast.error("Only PDF files are allowed.");
+      setFile(null);
+      return;
+    }
     setFile(file);
     pdfToText(file)
         .then((text) => {
@@ -253,7 +261,8 @@ const Create = () => {
           )}
 
           {activeTab === 'content' && (
-            <InputBox2
+           <div>
+             <InputBox2
               id="content"
               type="textarea"
               label="Content"
@@ -262,6 +271,9 @@ const Create = () => {
               placeholder="Enter additional content or instructions here"
               icon={Edit3}
             />
+            {content.length}/{maxChars} characters used
+           </div>
+
           )}
 
           {activeTab === 'file' && (
@@ -271,15 +283,20 @@ const Create = () => {
               label="Upload File"
               onChange={extractText}
               icon={Clipboard}
+              accept=".pdf"
             />
           )}
-          { (activeTab==='file' && file)?( <InputBox2
+          { (activeTab==='file' && file)?( 
+            <div>
+            <InputBox2
               id="content"
               type="textarea"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               icon={Edit3}
-            />):(<></>)
+            />
+            </div>
+            ):(<></>)
             }
             
 
