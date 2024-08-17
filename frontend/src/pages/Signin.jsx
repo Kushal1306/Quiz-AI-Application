@@ -90,7 +90,7 @@ function Signin() {
           className="w-full max-w-xs"
         />
       </div>
-      <div className="pt-4">
+      <div className="pt-2">
         <BottomWarning
           label={"Don't have an account?"}
           buttonText={"Sign up"}

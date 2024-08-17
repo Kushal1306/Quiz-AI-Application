@@ -51,7 +51,7 @@ function AppHeader() {
                         <nav className="hidden md:flex space-x-1">
                             <button onClick={() => handleNavigation("/dashboard")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">My Quizzes</button>
                             <button onClick={() => handleNavigation("/create")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Create a Quiz</button>
-                            <button onClick={() => handleNavigation("/take-a-quiz")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Test Your Knowledge</button>
+                            <button onClick={() => handleNavigation("/quiz")} className="px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Test Your Knowledge</button>
                         </nav>
                     </div>
                     <div className="flex items-center space-x-4">
@@ -99,7 +99,7 @@ function AppHeader() {
                     <nav className="flex flex-col p-2 space-y-1">
                         <button onClick={() => handleNavigation("/dashboard")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">My Quizzes</button>
                         <button onClick={() => handleNavigation("/create")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Create a Quiz </button>
-                        <button onClick={() => handleNavigation("/take-a-quiz")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Test Your Knowledge</button>
+                        <button onClick={() => handleNavigation("/quiz")} className="text-left px-3 py-1 text-sm font-medium text-gray-300 hover:text-white transition duration-300">Test Your Knowledge</button>
                     </nav>
                 </div>
             )}

@@ -18,14 +18,14 @@ import { Toaster } from 'react-hot-toast';
 
 function HeaderWrapper() {
   const location = useLocation();
-  const headerPaths = ['/dashboard', '/create',  '/take-a-quiz', '/image', '/leaderboard'];
+  const headerPaths = ['/dashboard', '/create',  '/quiz', '/image', '/leaderboard'];
   
   return headerPaths.includes(location.pathname) ? <AppHeader /> : null;
 }
 
 function MainContent() {
   const location = useLocation();
-  const headerPaths = ['/dashboard', '/create', '/take-a-quiz', '/image', '/leaderboard'];
+  const headerPaths = ['/dashboard', '/create', '/quiz', '/image', '/leaderboard'];
   
   return (
     <main className={`flex-grow ${headerPaths.includes(location.pathname) ? 'pt-16' : ''}`}>
@@ -35,7 +35,7 @@ function MainContent() {
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/dashboard' element={<MyQuizzes/>}/>
         <Route path='/play' element={<Play/>}/>
-        <Route path='/take-a-quiz' element={<TakeaQuiz/>}/>
+        <Route path='/quiz' element={<TakeaQuiz/>}/>
         <Route path='/create' element={<Create/>}/>
         <Route path='/image' element={<ImageQuiz/>}/>
         <Route path='/leaderboard' element={<Leaderboard/>}/>
