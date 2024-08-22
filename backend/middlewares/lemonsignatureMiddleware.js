@@ -5,10 +5,22 @@ dotenv.config();
 
 const LEMON_SQUEEZY_SIGNING_SECRET = process.env.LEMON_SECRET;
 
-const signatureMiddleware = (req, res, next) => {
+const getRawBody = (req) => {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', chunk => {
+      data += chunk.toString();
+    });
+    req.on('end', () => {
+      resolve(data);
+    });
+    req.on('error', reject);
+  });
+};
+
+const signatureMiddleware = async (req, res, next) => {
     try {
         const signature = req.headers['x-signature'];
-        const payload = req.rawBody;
         
         if (!LEMON_SQUEEZY_SIGNING_SECRET) {
             console.error('LEMON_SECRET is not set in environment variables');
@@ -20,11 +32,14 @@ const signatureMiddleware = (req, res, next) => {
             return res.status(400).json({ message: 'Missing signature' });
         }
 
+        const rawBody = await getRawBody(req);
+        
         const hmac = crypto.createHmac('sha256', LEMON_SQUEEZY_SIGNING_SECRET);
-        const digest = hmac.update(payload).digest('hex');
+        const digest = hmac.update(rawBody).digest('hex');
         
         if (crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest))) {
-            req.body = JSON.parse(payload);
+            req.rawBody = rawBody;
+            req.body = JSON.parse(rawBody);
             next();
         } else {
             console.error('Signature verification failed');
@@ -38,13 +53,5 @@ const signatureMiddleware = (req, res, next) => {
         });
     }
 };
-
-export const handleLemonSqueezyWebhook = async (req, res, next) => {
-    if (req.headers['content-type'] === 'application/json' && req.headers['x-signature']) {
-      req.rawBody = await buffer(req);
-      req.body = JSON.parse(req.rawBody);
-    }
-    next();
-  };
 
 export default signatureMiddleware;
