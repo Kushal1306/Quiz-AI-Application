@@ -7,9 +7,8 @@ const LEMON_SQUEEZY_SIGNING_SECRET = process.env.LEMON_SECRET;
 
 const signatureMiddleware = (req, res, next) => {
     try {
-        const signature =req.headers['X-Signature'];
-
-        const payload = JSON.stringify(req.body);
+        const signature = req.headers['x-signature'];
+        const payload = req.rawBody;
         
         if (!LEMON_SQUEEZY_SIGNING_SECRET) {
             console.error('LEMON_SECRET is not set in environment variables');
@@ -25,12 +24,11 @@ const signatureMiddleware = (req, res, next) => {
         const digest = hmac.update(payload).digest('hex');
         
         if (crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest))) {
+            req.body = JSON.parse(payload);
             next();
         } else {
             console.error('Signature verification failed');
-            return res.status(400).json({ message: 'Invalid signature',
-                signature:signature
-             });
+            return res.status(400).json({ message: 'Invalid signature' });
         }
     } catch (error) {
         console.error('Error in signature middleware:', error);
@@ -40,5 +38,13 @@ const signatureMiddleware = (req, res, next) => {
         });
     }
 };
+
+export const handleLemonSqueezyWebhook = async (req, res, next) => {
+    if (req.headers['content-type'] === 'application/json' && req.headers['x-signature']) {
+      req.rawBody = await buffer(req);
+      req.body = JSON.parse(req.rawBody);
+    }
+    next();
+  };
 
 export default signatureMiddleware;

@@ -1,8 +1,10 @@
 import express from 'express';
 import signatureMiddleware from '../middlewares/lemonsignatureMiddleware.js';
+import {handleLemonSqueezyWebhook} from '../middlewares/lemonsignatureMiddleware.js';
+
 const subscriptionRouter=express.Router();
 
-subscriptionRouter.post("/success",signatureMiddleware,(req,res)=>{
+subscriptionRouter.post("/success",handleLemonSqueezyWebhook,signatureMiddleware,(req,res)=>{
   const event=req.body;
   console.log("the event body is:",req.body);
   if(event.meta.event_name==="subscription_payment_success"){
