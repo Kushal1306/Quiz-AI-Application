@@ -17,7 +17,10 @@ const signatureMiddleware=(req,res,next)=>{
         return res.status(400).json({message:"request failed"});
 
     } catch (error) {
-        return res.status(404).json({message:'failure'});
+        
+        return res.status(404).json({message:'failure',
+            error:error
+        });
     }
    
 
