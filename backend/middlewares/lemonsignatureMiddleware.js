@@ -7,7 +7,8 @@ const LEMON_SQUEEZY_SIGNING_SECRET = process.env.LEMON_SECRET;
 
 const signatureMiddleware = (req, res, next) => {
     try {
-        const signature = req.headers['x-signature'];
+        const signature =req.headers['X-Signature'];
+
         const payload = JSON.stringify(req.body);
         
         if (!LEMON_SQUEEZY_SIGNING_SECRET) {
@@ -27,7 +28,9 @@ const signatureMiddleware = (req, res, next) => {
             next();
         } else {
             console.error('Signature verification failed');
-            return res.status(400).json({ message: 'Invalid signature' });
+            return res.status(400).json({ message: 'Invalid signature',
+                signature:signature
+             });
         }
     } catch (error) {
         console.error('Error in signature middleware:', error);
