@@ -5,7 +5,7 @@ const subscriptionRouter=express.Router();
 
 subscriptionRouter.post("/success",(req,res)=>{
   const event=req.body;
-  console.log(req.body);
+  console.log("the event body is:",req.body);
   if(event&&event.event==='subscription.success'){
     const subscriptionData=event.data;
     console.log(subscriptionData);
