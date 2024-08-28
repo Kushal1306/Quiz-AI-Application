@@ -22,6 +22,7 @@ function Header() {
       <nav>
         <div className="flex items-center space-x-1 sm:space-x-2">
           <button onClick={()=>scrollToscreen('landing')} className="rounded-full px-3 py-1 text-sm font-semibold text-white transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">Home</button>
+          <button onClick={()=>scrollToscreen('features')} className="rounded-full px-3 py-1 text-sm font-semibold text-white transition duration-300 ease-in-out hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">Features</button>
           <button onClick={()=>scrollToscreen('pricing')} className="rounded-full px-3 py-1 text-sm font-semibold text-white transition duration-300 ease-in-out hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">Pricing</button>
           <button className="rounded-full px-3 py-1 text-sm font-semibold text-white transition duration-300 ease-in-out hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">About</button>
           <button onClick={handleLogin} className="rounded-full px-3 py-1 text-sm font-semibold text-white transition duration-300 ease-in-out hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">Login</button>
